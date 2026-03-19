@@ -11,6 +11,7 @@
 
 package com.practiceProject.Ims_Project.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 //this annotation tells JPA that, this class is for setting up base only, and don't create any table for this class, as its used in further
 // child classes
 @MappedSuperclass
+@Schema(hidden = true)
 public abstract class BaseEntityEMR {
 
     @Id

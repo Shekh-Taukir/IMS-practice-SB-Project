@@ -47,6 +47,8 @@ public class Patient extends BaseEntityEMR{
     private LocalDate birthDate;
     private LocalDate deceasedDate;
 
+    private String email;
+
     //Enums dependent fields
     @Enumerated(EnumType.STRING)
     private UserPrefixEnum prefix;

@@ -2,6 +2,8 @@ package com.practiceProject.Ims_Project.controller;
 
 import com.practiceProject.Ims_Project.dto.PatientDto;
 import com.practiceProject.Ims_Project.service.PatientService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+@Tag(name = "Patient", description = "Patient Master Api's")
 @RestController
 @RequestMapping("/patient")
 @AllArgsConstructor
@@ -40,12 +43,12 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientDto> createPatient(@RequestBody PatientDto patientDto){
+    public ResponseEntity<PatientDto> createPatient(@Valid @RequestBody PatientDto patientDto){
         return ResponseEntity.status(HttpStatus.CREATED).body(patientService.createPatient(patientDto));
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<PatientDto> updatePatient(@PathVariable("id") Long patientId, @RequestBody PatientDto patientDto){
+    public ResponseEntity<PatientDto> updatePatient(@PathVariable("id") Long patientId, @Valid @RequestBody PatientDto patientDto){
         return ResponseEntity.status(HttpStatus.OK).body(patientService.updatePatient(patientId, patientDto));
     }
 
