@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-@Schema(hidden = true)
+//@Schema(hidden = true)
 public class ApiError {
     private String message;
     private HttpStatus code;
