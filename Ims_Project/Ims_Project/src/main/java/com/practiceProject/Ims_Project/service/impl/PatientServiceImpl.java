@@ -1,12 +1,19 @@
 package com.practiceProject.Ims_Project.service.impl;
 
+import com.practiceProject.Ims_Project.advices.PageResponse;
+import com.practiceProject.Ims_Project.dto.PatientBloodGroupCountDto;
 import com.practiceProject.Ims_Project.dto.PatientDto;
 import com.practiceProject.Ims_Project.entity.Patient;
 import com.practiceProject.Ims_Project.exception.ResourceNotFoundException;
 import com.practiceProject.Ims_Project.repository.PatientRepository;
 import com.practiceProject.Ims_Project.service.PatientService;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +27,8 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final ModelMapper modelMapper;
+
+    private final int PAGE_SIZE = 5;
 
     @Override
     public List<PatientDto> getPatientsList() {
@@ -90,10 +99,102 @@ public class PatientServiceImpl implements PatientService {
         return modelMapper.map(patientRepository.save(patient),PatientDto.class);
     }
 
+    @Override
+    public @Nullable List<PatientDto> getPatientsListPaged(String sortBy, String dir, Integer page) {
+        Pageable pageable = PageRequest.of(
+                page,
+                PAGE_SIZE,
+                Sort.by(Sort.Direction.fromString(dir),sortBy));
 
-    //----------------------INternal Methods for Service Methods
+        return patientRepository.
+                findAll(pageable).
+                map(patient -> modelMapper.map(patient,PatientDto.class))
+                .toList();
+    }
+
+    @Override
+    public Page<Patient> getPatientsFullPagedList(String sortBy, String dir, Integer page) {
+
+        //instead of creating pageable object per function, created a new function to return pageable object based on requested values
+        Pageable pageable = createPagable(page, sortBy, dir);
+//        Pageable pageable = PageRequest.of(page,PAGE_SIZE,
+//                Sort.by(
+//                        new Sort.Order(Sort.Direction.fromString(dir),sortBy),
+//                        Sort.Order.desc("tranId")
+//        ));
+        Page<Patient> patientPage =  patientRepository.findAll(pageable);
+        return patientPage;
+    }
+
+    @Override
+    public PageResponse<PatientDto> getCustomPatientPage(String sortBy, String dir, Integer page) {
+        Pageable pageable = createPagable(page,sortBy,dir);
+
+        Page<Patient> patientPage =  patientRepository.findAll(pageable);
+
+//        List<PatientDto> patientDtoList = patientPage
+//                .getContent()
+//                .stream()
+//                .map(patient -> modelMapper.map(patient,PatientDto.class))
+//                .toList();
+
+        return new PageResponse<>(
+                patientPage.getTotalPages(),
+                patientPage
+                        .getContent()
+                        .stream()
+                        .map(patient->modelMapper.map(patient,PatientDto.class))
+                        .toList()
+                );
+    }
+
+    @Override
+    public PageResponse<PatientDto> findPatientByFirstName(String sortBy, String dir, Integer page, String lastName) {
+        Pageable pageable = createPagable(page, sortBy,dir);
+
+        Page<Patient> patientPage = patientRepository.findByLastNameContainingIgnoreCase(lastName,pageable);
+
+        return new PageResponse<>(
+                patientPage.getTotalPages(),
+                patientPage
+                        .getContent()
+                        .stream()
+                        .map(patient -> modelMapper.map(patient,PatientDto.class))
+                        .toList()
+        );
+    }
+
+    @Override
+    public List<PatientBloodGroupCountDto> getBloodGroupStatsList() {
+        return patientRepository.getBloodGroupStatsList();
+    }
+
+    @Override
+    public PatientDto updatePatientNameById(Long id, String lastName) {
+        isPatientExists(id);
+
+        int updatedRow = patientRepository.updateLastNameById(lastName, id);
+        return getPatientById(id);
+    }
+
+
+    //----------------------Internal Methods for Service Methods
     private void isPatientExists(Long patientId){
         if (!patientRepository.existsById(patientId))
             throw new ResourceNotFoundException("Patient not found for id : "+patientId);
+    }
+
+    private Pageable createPagable(Integer apiPage, String apiSortBy, String apiSortOrder/*, String defSortBy, String defSortOrder*/){
+//        if (defSortBy == null)
+//            defSortBy = "tranId";
+//
+//        if (defSortOrder == null)
+//            defSortOrder = "desc";
+
+        return PageRequest.of(apiPage,PAGE_SIZE,
+                Sort.by(
+                        new Sort.Order(Sort.Direction.fromString(apiSortOrder),apiSortBy),
+                        new Sort.Order(Sort.Direction.fromString("desc"), "tranId")
+                ));
     }
 }
