@@ -19,12 +19,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.print.Doc;
 import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "patient_mst")
+@Table(name = "patient_mst_sb")
 @ToString
 public class Patient extends BaseEntityEMR{
     @Column(nullable = false, length = 50)
@@ -61,6 +62,22 @@ public class Patient extends BaseEntityEMR{
 
     @Enumerated(EnumType.STRING)
     private UserSexOrientationEnum sexualOrientation;
+
+    @OneToOne
+    @JoinColumn(
+            name = "office_id",
+            foreignKey = @ForeignKey(name="fk_patient_mst_sb_office_mst_sb"),
+            nullable = false
+    )
+    private Office office;
+
+    @OneToOne
+    @JoinColumn(
+            name = "doctor_id",
+            foreignKey = @ForeignKey(name="fk_patient_mst_sb_doctor_mst_sb"),
+            nullable = false
+    )
+    private Doctor doctor;
 
     //Other Module related fields
 //    private Long officeId;
