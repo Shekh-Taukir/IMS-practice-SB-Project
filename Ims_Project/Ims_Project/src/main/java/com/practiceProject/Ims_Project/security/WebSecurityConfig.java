@@ -8,12 +8,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
 @Configuration
@@ -21,11 +23,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
+    private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
+        // Mar 29, 2026 TaukirS (ER 1104 - Jwt Authentication integration changes)
         /// This setup is done, to use default security layer that is in Memory user Based
+        /*
         httpSecurity
                 .authorizeHttpRequests(auth->auth
                         .requestMatchers("/public/**", "/doctor/**").permitAll()
@@ -58,5 +63,24 @@ public class WebSecurityConfig {
 
         return new InMemoryUserDetailsManager(patient,admin,doctor);
     }
+    */
 
+        // Start Mar 29, 2026 TaukirS (ER 1104 - Jwt Authentication integration changes)
+        /// this setup is done, to remove the csrf configurations for default spring security flow
+        /// and have added public and auth apis to be accessible, and rest requires authentication for proceeding further
+        /// and added Jwt Auth filter in Spring security filter chain
+        httpSecurity
+                .csrf(csrfConfig -> csrfConfig.disable())
+                .sessionManagement(
+                        sessionConfig -> sessionConfig
+                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/public/**", "/auth/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return httpSecurity.build();
+        // End Mar 29, 2026 TaukirS (ER 1104 - Jwt Authentication integration changes)
+    }
 }

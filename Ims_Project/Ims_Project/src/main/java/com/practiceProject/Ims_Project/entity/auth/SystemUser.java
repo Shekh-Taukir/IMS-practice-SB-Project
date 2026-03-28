@@ -1,3 +1,13 @@
+////////////////////////////////////////////////
+//
+ // Name:
+//
+ // Description:
+//
+ // Version history:
+//
+// v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1104 - Jwt Authentication integration changes)
+ ////////////////////////////////////////////////
 package com.practiceProject.Ims_Project.entity.auth;
 
 import jakarta.persistence.*;
