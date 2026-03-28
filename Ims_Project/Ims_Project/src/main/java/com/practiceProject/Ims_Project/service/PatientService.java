@@ -35,5 +35,5 @@ public interface PatientService {
 
     List<PatientBloodGroupCountDto> getBloodGroupStatsList();
 
-    PatientDto updatePatientNameById(Long id, String lastName);
+    PatientDto updatePatientNameById(Long id, Map<String, String> updates);
 }

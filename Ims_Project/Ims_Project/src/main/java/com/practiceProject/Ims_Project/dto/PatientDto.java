@@ -2,6 +2,7 @@ package com.practiceProject.Ims_Project.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.practiceProject.Ims_Project.dto.baseFiles.BaseEntityVIewDto;
 import com.practiceProject.Ims_Project.entity.type.BloodGroupEnum;
 import com.practiceProject.Ims_Project.entity.type.UserPrefixEnum;
 import com.practiceProject.Ims_Project.entity.type.UserSexEnum;
@@ -22,16 +23,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder(value = {"tranId"}, alphabetic = true)
-public class PatientDto extends BaseEntityVIewDto{
+public class PatientDto extends BaseEntityVIewDto {
 
-//    @NotNull(message = "first name is required")
+    /*
+    //@NotNull(message = "first name is required")
     //Notnull is used when have to reject field : null
 
     //NotEmpty is used to reject | field : "" | field : null
-//    @NotEmpty(message = "first name is required")
+    //@NotEmpty(message = "first name is required")
 
     //Not Blank is used to reject | field : "   " | field : "" | field : null
     //generally used for string fields
+     */
     @NotBlank(message = "first name is required")
     @Size(min = 2,  max = 50, message = "First Name field should be or range 2 to 50 chars")
     private String firstName;
@@ -46,6 +49,7 @@ public class PatientDto extends BaseEntityVIewDto{
     @Size(min = 2,  max = 50, message = "aka field should be of range 2 to 50 chars")
     private String aka;
 
+    @NotEmpty(message = "Address is a required field")
     private String address1;
     private String address2;
 
@@ -59,6 +63,15 @@ public class PatientDto extends BaseEntityVIewDto{
     @Email(message = "Email value must be a valid Email")
     @NotBlank(message = "Email field is required")
     private String email;
+
+    //Foreign Key fields
+    @NotNull(message = "Office is a required field")
+    private Long officeId;
+
+    @NotNull(message = "Doctor is a required field")
+    private Long doctorId;
+
+    private Long testId;
 
     //Enums dependent fields
     @Enumerated(EnumType.STRING)

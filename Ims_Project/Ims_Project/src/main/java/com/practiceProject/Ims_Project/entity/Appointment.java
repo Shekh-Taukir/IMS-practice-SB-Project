@@ -1,21 +1,21 @@
 package com.practiceProject.Ims_Project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.practiceProject.Ims_Project.entity.baseFiles.BaseEntityEMR;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Data
-@Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "appointment_mst_sb")
-public class Appointment extends BaseEntityEMR{
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
+@Data
+public class Appointment extends BaseEntityEMR {
     private LocalDate apptDate;
     private LocalTime apptTime;
 
@@ -27,27 +27,22 @@ public class Appointment extends BaseEntityEMR{
 
     private Integer duration;
 
+    @JoinColumn( name = "patient_id", foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_patient_mst_sb") )
+    @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(
-            name = "patient_id",
-            foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_patient_mst_sb"),
-            nullable = false
-    )
     private Patient patient;
 
+    @JoinColumn( name="office_id", foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_office_msg_sb"))
+    @ToString.Exclude
+    @JsonIgnore
     @OneToOne
-    @JoinColumn(
-            name="office_id",
-            foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_office_msg_sb"),
-            nullable = false
-    )
     private Office office;
 
+    @JoinColumn(name = "doctor_id", foreignKey = @ForeignKey(name = "fk_appointment_msg_sb_doctor_mst_sb") )
+    @ToString.Exclude
+    @JsonIgnore
     @OneToOne
-    @JoinColumn(
-            name = "doctor_id",
-            foreignKey = @ForeignKey(name = "fk_appointment_msg_sb_doctor_mst_sb")
-    )
     private Doctor doctor;
 
     //in Future
@@ -56,4 +51,25 @@ public class Appointment extends BaseEntityEMR{
 //    private Procedure procedureId;
 //    private VisitType visitTypeId;
 
+    //--------------------------------Foreign Key Showable Columns
+    @Column(updatable = false, insertable = false)
+    @ToString.Include(name = "officeId")
+    @JsonProperty("officeId")
+    public Long getOfficeId(){
+        return office.getTranId();
+    }
+
+    @Column(updatable = false, insertable = false)
+    @ToString.Include(name = "doctorId")
+    @JsonProperty("doctorId")
+    public Long getDoctorId(){
+        return doctor.getTranId();
+    }
+
+    @Column(updatable = false, insertable = false)
+    @ToString.Include(name = "patientId")
+    @JsonProperty("patientId")
+    public Long getPatientId(){
+        return patient.getTranId();
+    }
 }

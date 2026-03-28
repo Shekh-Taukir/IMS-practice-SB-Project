@@ -9,7 +9,7 @@
 // v1.0 || type : New Func || Mar 16, 2026 || TaukirS (ER 1101 - Patient Master Base Changes in SB project)d
  ////////////////////////////////////////////////
 
-package com.practiceProject.Ims_Project.entity;
+package com.practiceProject.Ims_Project.entity.baseFiles;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -30,6 +30,7 @@ public abstract class BaseEntityEMR {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //<- this strategy works like autogenerate system in DB.
+    @Column(updatable = false)
     private Long tranId;
 
     //system for autopopulating value for createdById and changedById, will be implemented afterwards of making the base system for project.

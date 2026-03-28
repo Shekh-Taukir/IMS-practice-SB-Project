@@ -7,7 +7,9 @@ import com.practiceProject.Ims_Project.entity.Patient;
 import com.practiceProject.Ims_Project.exception.ResourceNotFoundException;
 import com.practiceProject.Ims_Project.repository.PatientRepository;
 import com.practiceProject.Ims_Project.service.PatientService;
+import com.practiceProject.Ims_Project.service.helperServices.EntityFinder;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -20,15 +22,20 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final ModelMapper modelMapper;
+    private final EntityFinder entityFinder;
 
     private final int PAGE_SIZE = 5;
+
+    ///----------------------API Service Methods
 
     @Override
     public List<PatientDto> getPatientsList() {
@@ -43,6 +50,15 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientDto createPatient(PatientDto patientDto) {
         Patient newPatient = modelMapper.map(patientDto, Patient.class);
+
+        newPatient.setOffice(
+                entityFinder.findOfficeByIdOrException(patientDto.getOfficeId())
+        );
+
+        newPatient.setDoctor(
+                entityFinder.findDoctorByIdOrException(patientDto.getDoctorId())
+        );
+
         newPatient = patientRepository.save(newPatient);
         return modelMapper.map(newPatient, PatientDto.class);
     }
@@ -63,6 +79,16 @@ public class PatientServiceImpl implements PatientService {
 
         patientDto.setTranId(patientId);
         modelMapper.map(patientDto, patient);
+
+        //Start Mar 28, 2026 TaukirS (ER 1102 - Completing all necessary modules API's)
+        patient.setOffice(
+                entityFinder.findOfficeByIdOrException(patientDto.getOfficeId())
+        );
+        patient.setDoctor(
+                entityFinder.findDoctorByIdOrException(patientDto.getDoctorId())
+        );
+        //End Mar 28, 2026 TaukirS (ER 1102 - Completing all necessary modules API's)
+
         patient = patientRepository.save(patient);
 
         return modelMapper.map(patient,PatientDto.class);
@@ -78,20 +104,28 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientDto updatePartialPatient(Long patientId, Map<String, Object> updates) {
         isPatientExists(patientId);
-
         Patient patient = patientRepository.findById(patientId).get();
 
         updates.forEach((field, value)->{
-            Field fieldToBeUdpated = ReflectionUtils.getRequiredField(Patient.class,field);
-            fieldToBeUdpated.setAccessible(true);
+            if (field.equals("officeId"))
+                patient.setOffice(entityFinder.findOfficeByIdOrException(((Number) value).longValue()));
 
-            if (fieldToBeUdpated.getType().isEnum()){
-                ReflectionUtils.setField(
-                        fieldToBeUdpated,
-                        patient,
-                        Enum.valueOf((Class<Enum>)fieldToBeUdpated.getType(),value.toString()));
-            }
+            else if (field.equals("doctorId"))
+                patient.setDoctor(entityFinder.findDoctorByIdOrException(Long.valueOf(value.toString())));
+
             else {
+                Field fieldToBeUdpated = ReflectionUtils.getRequiredField(Patient.class,field);
+                fieldToBeUdpated.setAccessible(true);
+
+                if (fieldToBeUdpated.getType().isEnum())
+                    value = Enum.valueOf((Class<Enum>) fieldToBeUdpated.getType(), value.toString());
+//                    ReflectionUtils.setField(
+//                            fieldToBeUdpated,
+//                            patient,
+//                            Enum.valueOf((Class<Enum>)fieldToBeUdpated.getType(),value.toString()));
+                else if ((fieldToBeUdpated.getType().equals(Long.class)) && (value instanceof Number))
+                    value = ((Number)value).longValue();
+
                 ReflectionUtils.setField(fieldToBeUdpated, patient, value);
             }
         });
@@ -170,15 +204,22 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public PatientDto updatePatientNameById(Long id, String lastName) {
+    public PatientDto updatePatientNameById(Long id, Map<String, String> updates) {
         isPatientExists(id);
+
+        String lastName = Optional.ofNullable(updates.get("lastName"))
+                .orElseThrow(()->{
+                    String errorString = "Provide proper field and value property, to update lastName of Patient | object : "+updates;
+                    log.error(errorString);
+                    return new IllegalArgumentException(errorString);
+                });
 
         int updatedRow = patientRepository.updateLastNameById(lastName, id);
         return getPatientById(id);
     }
 
 
-    //----------------------Internal Methods for Service Methods
+    ///----------------------Internal Methods for Service Methods
     private void isPatientExists(Long patientId){
         if (!patientRepository.existsById(patientId))
             throw new ResourceNotFoundException("Patient not found for id : "+patientId);

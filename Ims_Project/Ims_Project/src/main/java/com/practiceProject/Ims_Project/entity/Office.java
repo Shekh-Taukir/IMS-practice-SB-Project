@@ -1,8 +1,10 @@
 package com.practiceProject.Ims_Project.entity;
 
+import com.practiceProject.Ims_Project.entity.baseFiles.BaseEntityEMR;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +13,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "office_mst_sb")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Office extends BaseEntityEMR{
+@Builder
+public class Office extends BaseEntityEMR {
     private String name;
     private String code;
     private String phoneNumber;

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-@Tag(name = "Patient", description = "Patient Master Api's")
+@Tag(name = "Patient Master", description = "Patient Master Api's")
 @RestController
 @RequestMapping("/patient")
 @AllArgsConstructor
@@ -79,9 +79,9 @@ public class PatientController {
         return ResponseEntity.ok(patientService.getBloodGroupStatsList());
     }
 
-    @PostMapping("/updateLName/{id} - {lName}")
-    public ResponseEntity<PatientDto> updatePatientNameById(@PathVariable("id")Long id, @PathVariable("lName") String lastName){
-        return ResponseEntity.ok(patientService.updatePatientNameById(id, lastName));
+    @PatchMapping("/updateLName/{id}")
+    public ResponseEntity<PatientDto> updatePatientNameById(@PathVariable("id")Long id, @RequestBody Map<String, String> updates){
+        return ResponseEntity.ok(patientService.updatePatientNameById(id, updates));
     }
 
     @PostMapping
