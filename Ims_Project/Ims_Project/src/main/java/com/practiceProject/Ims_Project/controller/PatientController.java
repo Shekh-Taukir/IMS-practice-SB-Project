@@ -21,9 +21,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Tag(name = "Patient Master", description = "Patient Master Api's")
-@RestController
 @RequestMapping("/patient")
 @AllArgsConstructor
+@RestController
 public class PatientController {
 
     private final PatientService patientService;
@@ -39,23 +39,21 @@ public class PatientController {
     }
 
     @GetMapping("/pageList")
-    public ResponseEntity<List<PatientDto>> getPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy,@RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page){
-
+    public ResponseEntity<List<PatientDto>> getPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy,@RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page)
+    {
         return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatientsListPaged(sortBy, dir, page));
     }
 
     @GetMapping("/fullPageList")
-    public ResponseEntity<Page<Patient>> getFullPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page){
-
+    public ResponseEntity<Page<Patient>> getFullPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page)
+    {
         return ResponseEntity.status(HttpStatus.OK).body(patientService.getPatientsFullPagedList(sortBy, dir, page));
-
     }
 
     @GetMapping("/customPageList")
-    public ResponseEntity<PageResponse<PatientDto>> getCustomPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page){
-
+    public ResponseEntity<PageResponse<PatientDto>> getCustomPagedPatientList(@RequestParam(defaultValue = "tranId") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page)
+    {
         return ResponseEntity.status(HttpStatus.OK).body(patientService.getCustomPatientPage(sortBy, dir, page));
-
     }
 
     @GetMapping("/{id}")
@@ -69,8 +67,8 @@ public class PatientController {
     }
 
     @GetMapping("/byLastName/{lName}")
-    public ResponseEntity<PageResponse<PatientDto>> findPatientByFirstName(@RequestParam(defaultValue = "lastName") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page, @PathVariable("lName") String lastName){
-
+    public ResponseEntity<PageResponse<PatientDto>> findPatientByFirstName(@RequestParam(defaultValue = "lastName") String sortBy, @RequestParam(defaultValue = "asc") String dir, @RequestParam(defaultValue = "0") Integer page, @PathVariable("lName") String lastName)
+    {
         return ResponseEntity.status(HttpStatus.OK).body(patientService.findPatientByFirstName(sortBy, dir, page,lastName));
     }
 
