@@ -106,6 +106,12 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>3.0.0</version>
         </dependency>
+<!--        This is the custom library dependency-->
+        <dependency>
+            <groupId>com.libraryCoding</groupId>
+            <artifactId>commonLibrary</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 
 	<build>

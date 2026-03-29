@@ -1,13 +1,3 @@
-////////////////////////////////////////////////
-//
- // Name:
-//
- // Description:
-//
- // Version history:
-//
-// v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1104 - Jwt Authentication integration changes)
- ////////////////////////////////////////////////
 package com.practiceProject.Ims_Project.security;
 
 import com.practiceProject.Ims_Project.entity.auth.SystemUser;
@@ -21,6 +11,16 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+
+////////////////////////////////////////////////
+//
+// Name: AuthUtil class
+//
+// Description:
+//
+// Version history:
+// v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1104 - Jwt Authentication integration changes)
+////////////////////////////////////////////////
 
 @Component
 @Slf4j
@@ -53,6 +53,7 @@ public class AuthUtil {
                 .subject(user.getUsername())
                 .claim("userId",user.getId().toString())
                 .issuedAt(new Date())
+                ///expiration added is of 10 mins, because as it takes milliseconds as input
                 .expiration(new Date(System.currentTimeMillis()+1000*60*10))
                 .signWith(getSecretKey())
                 .compact();

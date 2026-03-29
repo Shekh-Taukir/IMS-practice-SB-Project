@@ -17,20 +17,19 @@ public class ApiResponse<T> {
     private boolean success;
 
     public ApiResponse(ApiError error) {
-        //default constructor called, to set timestamp to ApiResponse object
-        this();
+        ///default constructor called, to set timestamp to ApiResponse object, and success flag
+        this(false);
         this.error = error;
-        this.success = false;
     }
 
     public ApiResponse(T data) {
-        //default constructor called, to set timestamp to ApiResponse object
-        this();
+        ///default constructor called, to set timestamp to ApiResponse object
+        this(true);
         this.data = data;
-        this.success = true;
     }
 
-    public ApiResponse() {
+    public ApiResponse(boolean successFlag) {
         this.timeStamp = LocalDateTime.now();
+        this.success = successFlag;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -22,8 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
     private final JwtAuthFilter jwtAuthFilter;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -75,10 +77,17 @@ public class WebSecurityConfig {
                         sessionConfig -> sessionConfig
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .logout(logout->logout.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**", "/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                //Start Mar 29, 2026 TaukirS (ER 1107 - add authEntryPoint exception class in authorization layer)
+                /// Need to raise exception when user don't pass Authorization token for authenticated API's
+                .exceptionHandling(ex->ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
+                //End Mar 29, 2026 TaukirS (ER 1107 - add authEntryPoint exception class in authorization layer)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
         // End Mar 29, 2026 TaukirS (ER 1104 - Jwt Authentication integration changes)

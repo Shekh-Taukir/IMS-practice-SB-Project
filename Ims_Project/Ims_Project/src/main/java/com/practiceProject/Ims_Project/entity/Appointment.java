@@ -29,19 +29,19 @@ public class Appointment extends BaseEntityEMR {
 
     @JoinColumn( name = "patient_id", foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_patient_mst_sb") )
     @ToString.Exclude
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne
     private Patient patient;
 
     @JoinColumn( name="office_id", foreignKey = @ForeignKey(name = "fk_appointment_mst_sb_office_msg_sb"))
     @ToString.Exclude
-    @JsonIgnore
+//    @JsonIgnore
     @OneToOne
     private Office office;
 
     @JoinColumn(name = "doctor_id", foreignKey = @ForeignKey(name = "fk_appointment_msg_sb_doctor_mst_sb") )
     @ToString.Exclude
-    @JsonIgnore
+//    @JsonIgnore
     @OneToOne
     private Doctor doctor;
 
