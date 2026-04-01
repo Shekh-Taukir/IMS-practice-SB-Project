@@ -23,7 +23,7 @@ public class ApiResponse<T> {
     }
 
     public ApiResponse(T data) {
-        ///default constructor called, to set timestamp to ApiResponse object
+        ///default constructor called, to set timestamp, and success flag to ApiResponse object
         this(true);
         this.data = data;
     }

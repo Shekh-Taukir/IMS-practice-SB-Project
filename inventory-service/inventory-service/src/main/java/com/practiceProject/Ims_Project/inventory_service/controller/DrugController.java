@@ -1,8 +1,10 @@
 package com.practiceProject.Ims_Project.inventory_service.controller;
 
+import com.practiceProject.Ims_Project.inventory_service.advices.ApiResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,11 +32,16 @@ public class DrugController {
 
         ServiceInstance serviceInstance = discoveryClient.getInstances("ims-project").getFirst();
 
-        String response = restClient.get()
+        ApiResponse<String> response = restClient.get()
                 .uri(serviceInstance.getUri()+"/ims/public/libraryTest")
                 .retrieve()
-                .body(String.class);
+                .body(new ParameterizedTypeReference<>() {});
 
-        return "Response from IMS API : "+response;
+        if(response!=null && response.isSuccess()){
+            String data = response.getData();
+            return "Response from IMS API : "+data;
+        } else {
+            return "Response contains error : "+response.getError();
+        }
     }
 }

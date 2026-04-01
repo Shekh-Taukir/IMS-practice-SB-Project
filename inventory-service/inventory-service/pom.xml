@@ -8,6 +8,7 @@
 // Version history:
 //
 // v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
+// v1.2 || type : Change || Apr 01, 2026 || TaukirS (ER 1108 - OpenFeign client setup)
 ////////////////////////////////////////////////
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -79,6 +80,13 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+<!--//Start Apr 01, 2026 TaukirS (ER 1108 - OpenFeign client setup)-->
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+<!--//End Apr 01, 2026 TaukirS (ER 1108 - OpenFeign client setup)-->
 	</dependencies>
 
 <!--        //Start Apr 01, 2026 TaukirS (ER 1106 - Eureka servier config)-->

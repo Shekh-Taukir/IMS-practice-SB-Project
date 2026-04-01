@@ -1,5 +1,6 @@
 package com.practiceProject.Ims_Project.controller;
 
+import com.practiceProject.Ims_Project.advices.ApiResponse;
 import com.practiceProject.Ims_Project.advices.PageResponse;
 import com.practiceProject.Ims_Project.dto.PatientBloodGroupCountDto;
 import com.practiceProject.Ims_Project.dto.PatientDto;
@@ -93,8 +94,9 @@ public class PatientController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<String> deletePatient(@PathVariable("id") Long patientId){
-        return ResponseEntity.status(HttpStatus.OK).body(patientService. deletePatientById(patientId));
+    public ResponseEntity<ApiResponse<String>> deletePatient(@PathVariable("id") Long patientId){
+        return ResponseEntity.ok(new ApiResponse<>(patientService.deletePatientById(patientId)));
+//        return ResponseEntity.status(HttpStatus.OK).body(patientService. deletePatientById(patientId));
     }
 
     @PatchMapping("{id}")
