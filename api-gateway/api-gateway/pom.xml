@@ -8,6 +8,7 @@
 // Version history:
 //
 // v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
+// v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1107 - API gateway config changes)
 ////////////////////////////////////////////////
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -45,7 +46,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-gateway-server-webmvc</artifactId>
+<!--            //Apr 01, 2026 TaukirS (ER 1107 - API gateway config changes) - changed from gateway server webmc to webflux, so that api gatewway fro backend api service can be done-->
+			<artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
 		</dependency>
 <!--        //Start Apr 01, 2026 TaukirS (ER 1106 - Eureka servier config)-->
 		<dependency>
