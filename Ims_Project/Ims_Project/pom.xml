@@ -10,6 +10,7 @@
 // v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1101)
 // v1.2 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
 // v1.3 || type : Change || Apr 01, 2026 || TaukirS (ER 1108 - OpenFeign client setup)
+// v1.1 || type : Change || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
 ////////////////////////////////////////////////
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -152,6 +153,14 @@
         </dependency>
 <!--//End Apr 01, 2026 TaukirS (ER 1108 - OpenFeign client setup)-->
 
+<!--//Start Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+<!--//End Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
+
 <!--        This is the custom library dependency-->
         <dependency>
             <groupId>com.libraryCoding</groupId>
@@ -181,10 +190,24 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<annotationProcessorPaths>
+                        <!--//Start Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.5.5.Final</version>
+                        </path>
+                        <!--//End Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</path>
+                        <!--//Start Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                        <!--//End Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project)-->
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>

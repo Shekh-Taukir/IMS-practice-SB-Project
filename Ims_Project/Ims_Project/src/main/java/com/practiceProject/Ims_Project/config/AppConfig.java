@@ -9,9 +9,23 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+////////////////////////////////////////////////
+//
+ // Name: App Config file
+//
+ // Description:
+//
+ // Version history:
+//
+ // v1.1 || type : New Func || Mar 19, 2026 || TaukirS (ER 1101)
+ // v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1104 - Jwt Authentication integration changes)
+ // v1.1 || type : Change || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
+////////////////////////////////////////////////
+
 @Configuration
 @Schema(hidden = true)
-public class ModelMapperConfig {
+//Apr 02, 2026 TaukirS (ER 1109 - implement drug module in ims_project) changed the file name to AppConfig
+public class AppConfig {
 
     @Bean
     public ModelMapper getModelMapper(){
