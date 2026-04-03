@@ -10,6 +10,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+////////////////////////////////////////////////
+//
+ // Name: Prescription Controller
+//
+ // Description:
+//
+ // Version history:
+//
+ // v1.1 || type : New Func || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
+////////////////////////////////////////////////
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/public/presc")
@@ -28,6 +39,8 @@ public class PrescriptionController {
     public ResponseEntity<PrescriptionRequestDto> createPrescription(@Valid @RequestBody PrescriptionRequestDto prescriptionRequestDto){
         log.info("[controller] Adding new prescription");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(prescriptionService.createPrescription(prescriptionRequestDto));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(prescriptionService.createPrescription(prescriptionRequestDto));
     }
 }

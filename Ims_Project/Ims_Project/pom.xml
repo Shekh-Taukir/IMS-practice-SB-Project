@@ -10,7 +10,7 @@
 // v1.1 || type : Change || Mar 29, 2026 || TaukirS (ER 1101)
 // v1.2 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
 // v1.3 || type : Change || Apr 01, 2026 || TaukirS (ER 1108 - OpenFeign client setup)
-// v1.1 || type : Change || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
+// v1.4 || type : Change || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
 ////////////////////////////////////////////////
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

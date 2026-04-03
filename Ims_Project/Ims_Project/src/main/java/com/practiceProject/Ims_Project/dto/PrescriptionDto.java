@@ -34,3 +34,6 @@ public class PrescriptionDto extends BaseEntityVIewDto {
 
     private String drug_name;
 }
+
+
+// prescriptionDto.getDaysToTake() * prescriptionDto.getDoseIntake()
