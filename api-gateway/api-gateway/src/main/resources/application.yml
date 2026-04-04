@@ -8,6 +8,7 @@
 #//
 #// v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
 #// v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1107 - API gateway config changes)
+#// v1.1 || type : Change || Apr 04, 2026 || TaukirS (ER 1112 - api gateway global filter implmentation)
 #////////////////////////////////////////////////
 spring:
   application:
@@ -25,6 +26,8 @@ spring:
                 - Path=/api/v1/ims/**
               filters:
                 - StripPrefix=2
+#                //Apr 04, 2026 TaukirS (ER 1112 - api gateway global filter implmentation)
+                - name: LoggingIMSFilter
 
             - id: inventory-service
               uri: lb://INVENTORY-SERVICE

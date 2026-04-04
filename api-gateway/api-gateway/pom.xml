@@ -7,8 +7,9 @@
 //
 // Version history:
 //
-// v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
-// v1.1 || type : Change || Apr 01, 2026 || TaukirS (ER 1107 - API gateway config changes)
+// v1.1 || type : New FUnc || Apr 01, 2026 || TaukirS (ER 1106 - Eureka servier config)
+// v1.2 || type : Change || Apr 01, 2026 || TaukirS (ER 1107 - API gateway config changes)
+// v1.3 || type : Change || Apr 04, 2026 || TaukirS (ER 1112 - api gateway global filter implmentation)
 ////////////////////////////////////////////////
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -61,6 +62,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+<!--//Start Apr 04, 2026 TaukirS (ER 1112 - api gateway global filter implmentation)-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+<!--//End Apr 04, 2026 TaukirS (ER 1112 - api gateway global filter implmentation)-->
 	</dependencies>
 
 <!--        //Start Apr 01, 2026 TaukirS (ER 1106 - Eureka servier config)-->
