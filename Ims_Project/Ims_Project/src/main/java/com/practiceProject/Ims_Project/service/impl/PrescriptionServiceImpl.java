@@ -12,6 +12,8 @@ import com.practiceProject.Ims_Project.mappers.PrescriptionMapper;
 import com.practiceProject.Ims_Project.repository.PrescriptionRepository;
 import com.practiceProject.Ims_Project.service.PrescriptionService;
 import com.practiceProject.Ims_Project.service.helperServices.EntityFinder;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,8 @@ import java.util.List;
  // Version history:
 //
  // v1.1 || type : Change || Apr 02, 2026 || TaukirS (ER 1109 - implement drug module in ims_project)
- // v1.1 || type : Change || Apr 03, 2026 || TaukirS (ER 1110 - Drug entity implementation in inventory_service)
+ // v1.2 || type : Change || Apr 03, 2026 || TaukirS (ER 1110 - Drug entity implementation in inventory_service)
+ // v1.3 || type : Change || Apr 04, 2026 || TaukirS (ER 1111 - resillience4j implementation in ims_project)
 ////////////////////////////////////////////////
 
 @RequiredArgsConstructor
@@ -55,6 +58,12 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                 .build();
     }
 
+
+    //Start Apr 04, 2026 TaukirS (ER 1111 - resillience4j implementation in ims_project)
+    /// added retry mechanism, for inventory service call
+    @Retry(name = "inventoryRetry", fallbackMethod = "createPrescriptionFallback")
+    @RateLimiter(name="inventoryRateLimiter", fallbackMethod = "createPrescriptionFallback")
+    //End Apr 04, 2026 TaukirS (ER 1111 - resillience4j implementation in ims_project)
     @Override
     @Transactional
     public PrescriptionRequestDto createPrescription(PrescriptionRequestDto prescriptionRequestDto) {
@@ -71,9 +80,9 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
         log.info("[Create Prescription Service Impl] Calling inventory service, to check and reduce durg stock");
 
-        if (!inventoryFeignClient.checkDrugAndStock(drugStockRequestDto)){
+        if (!inventoryFeignClient.checkDrugAndStock(drugStockRequestDto))
             throw new ResourceNotFoundException("Required stock for drug is not available in inventory.");
-        }
+
 
         for(PrescriptionDto prescriptionDto : prescriptionRequestDto.getPrescriptionList()){
             prescription = prescriptionMapper.toEntity(prescriptionDto);
@@ -90,10 +99,18 @@ public class PrescriptionServiceImpl implements PrescriptionService {
         }
 
         return prescriptionRequestDto;
-
     }
 
     // ----------------------Internal methods
 
 
+    //Start Apr 04, 2026 TaukirS (ER 1111 - resillience4j implementation in ims_project)
+    /// Throwable method for api method : createPrescription()
+    public PrescriptionRequestDto createPrescriptionFallback(PrescriptionRequestDto prescriptionRequestDto, Throwable throwable) {
+        log.error("createPrescriptionFallback | Not able to communicate with inventory-service, to check and update stocks | msg : {}",
+                throwable.getMessage()
+        );
+        return new PrescriptionRequestDto();
+    }
+    //End Apr 04, 2026 TaukirS (ER 1111 - resillience4j implementation in ims_project)
 }
