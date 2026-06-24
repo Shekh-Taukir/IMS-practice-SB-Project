@@ -1,11 +1,9 @@
 package com.tsTech.practice.IMS_v2.entities.base;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import jdk.jfr.BooleanFlag;
-import lombok.Builder;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -25,11 +23,15 @@ import java.time.LocalDateTime;
 ////////////////////////////////////////////////
 
 @MappedSuperclass
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tran_id;
+    private Long tranId;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -38,5 +40,7 @@ public abstract class BaseEntity {
     private LocalDateTime updatedAt;
 
     @ColumnDefault(value = "true")
-    private Boolean isActive;
+    @JsonProperty("isActive")
+    @Column(nullable = false)
+    private Boolean isActive=true;
 }

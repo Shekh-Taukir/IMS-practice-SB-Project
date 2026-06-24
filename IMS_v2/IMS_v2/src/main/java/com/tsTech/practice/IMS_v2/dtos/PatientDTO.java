@@ -1,43 +1,43 @@
-package com.tsTech.practice.IMS_v2.entities;
+package com.tsTech.practice.IMS_v2.dtos;
 
-import com.tsTech.practice.IMS_v2.entities.base.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.tsTech.practice.IMS_v2.dtos.base.BaseDTO;
 import com.tsTech.practice.IMS_v2.entityEnums.UserPrefixEnum;
 import com.tsTech.practice.IMS_v2.entityEnums.UserSexEnum;
 import com.tsTech.practice.IMS_v2.entityEnums.UserSexualOrientation;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-////////////////////////////////////////////////
+/////////////////////////////////////////////
 //
-// Name: Patient Mst entity
+// Name: PatientDTO
 //
- // Description:
+// Description:
 //
- // Version history:
+// Version history:
 //
- // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
+// v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 ////////////////////////////////////////////////
 
-@Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "patient_mst_sb")
-public class Patient extends BaseEntity {
-
+@NoArgsConstructor
+@JsonPropertyOrder({"tranId"})
+public class PatientDTO extends BaseDTO {
     private String firstName;
     private String lastName;
     private String middleName;
     private String aka;
 
-    @Column(length = 500)
     private String address1;
-
-    @Column(length = 500)
     private String address2;
 
     private LocalDate birthDate;
@@ -51,7 +51,6 @@ public class Patient extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserSexEnum sex;
 
-    @Column(length = 2000)
     private String note;
 
     @Enumerated(EnumType.STRING)
