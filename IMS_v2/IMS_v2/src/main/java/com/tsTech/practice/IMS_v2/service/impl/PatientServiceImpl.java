@@ -2,6 +2,7 @@ package com.tsTech.practice.IMS_v2.service.impl;
 
 import com.tsTech.practice.IMS_v2.dtos.PatientDTO;
 import com.tsTech.practice.IMS_v2.entities.Patient;
+import com.tsTech.practice.IMS_v2.exceptions.ResourceNotFoundException;
 import com.tsTech.practice.IMS_v2.repository.PatientRepository;
 import com.tsTech.practice.IMS_v2.service.PatientService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 ////////////////////////////////////////////////
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 // Version history:
 //
 // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
+// v1.2 || type : Change || Jun 25, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
 ////////////////////////////////////////////////
 
 @Service
@@ -49,50 +50,49 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public Optional<PatientDTO> getPatientById(Long tranId) {
-        return getPatientEntityById(tranId)
-                .map(patient->modelMapper.map(patient, PatientDTO.class));
+    public PatientDTO getPatientById(Long tranId) {
+        return modelMapper.map(getPatientEntityById(tranId), PatientDTO.class);
     }
 
     @Override
-    public Optional<PatientDTO> updatePatientById(Long tranId, PatientDTO patientDTO) {
+    public PatientDTO updatePatientById(Long tranId, PatientDTO patientDTO) {
+        Patient patient = getPatientEntityById(tranId);
+        patientDTO.setTranId(tranId);
+        modelMapper.map(patientDTO, patient);
+        return modelMapper.map(patientRepository.save(patient), PatientDTO.class);
 
-        return getPatientEntityById(tranId).map(patient -> {
-           patientDTO.setTranId(tranId);
-           modelMapper.map(patientDTO, patient);
-           return modelMapper.map(patientRepository.save(patient), PatientDTO.class);
-        });
     }
 
     @Override
     public Boolean deletePatientById(Long tranId) {
-        return getPatientEntityById(tranId).map(patient1->{
-            patientRepository.delete(patient1);
-            return true;
-        }).orElse(false);
-
+        Patient patient = getPatientEntityById(tranId);
+        patientRepository.delete(patient);
+        return true;
     }
 
     @Override
-    public Optional<PatientDTO> patchPatientById(Long tranId, Map<String, Object> patchData) {
-        return getPatientEntityById(tranId).map(patient -> {
-            patchData.forEach((key, value)->{
-                Field fieldToBeUpdated = ReflectionUtils.getRequiredField(Patient.class, key);
-                fieldToBeUpdated.setAccessible(true);
+    public PatientDTO patchPatientById(Long tranId, Map<String, Object> patchData) {
+        Patient patient = getPatientEntityById(tranId);
 
-                if(fieldToBeUpdated.getType().isEnum()){
-                    Class<Enum> enumType = (Class<Enum>) fieldToBeUpdated.getType();
-                    Enum enumValue = Enum.valueOf(enumType, value.toString());
-                    ReflectionUtils.setField(fieldToBeUpdated, patient, enumValue);
-                } else
-                    ReflectionUtils.setField(fieldToBeUpdated, patient, value);
-            });
-            return modelMapper.map(patientRepository.save(patient), PatientDTO.class);
+        patchData.forEach((key, value)->{
+            Field fieldToBeUpdated = ReflectionUtils.getRequiredField(Patient.class, key);
+            fieldToBeUpdated.setAccessible(true);
+
+            if(fieldToBeUpdated.getType().isEnum()){
+                Class<Enum> enumType = (Class<Enum>) fieldToBeUpdated.getType();
+                Enum enumValue = Enum.valueOf(enumType, value.toString());
+                ReflectionUtils.setField(fieldToBeUpdated, patient, enumValue);
+            } else
+                ReflectionUtils.setField(fieldToBeUpdated, patient, value);
         });
+        return modelMapper.map(patientRepository.save(patient), PatientDTO.class);
+
     }
 
     //Internal Function
-    public Optional<Patient> getPatientEntityById(Long tranId){
-        return patientRepository.findById(tranId);
+    public Patient getPatientEntityById(Long tranId){
+        return patientRepository
+                .findById(tranId)
+                .orElseThrow(()->new ResourceNotFoundException("Patient not found for id: "+tranId));
     }
 }
