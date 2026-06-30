@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.patient.advices;
+package com.tsTech.practice.IMS_v2.common.advices;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;

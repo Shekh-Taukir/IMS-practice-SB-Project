@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.patient.annotations;
+package com.tsTech.practice.IMS_v2.common.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.OverridesAttribute;

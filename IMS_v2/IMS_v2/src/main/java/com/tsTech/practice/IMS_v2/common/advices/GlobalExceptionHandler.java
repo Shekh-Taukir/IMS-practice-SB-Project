@@ -1,6 +1,7 @@
-package com.tsTech.practice.IMS_v2.patient.advices;
+package com.tsTech.practice.IMS_v2.common.advices;
 
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityExistsException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
@@ -51,13 +52,17 @@ public class GlobalExceptionHandler {
         return getApiResponseObj(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+//    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<?>> handleInternalServerError(RuntimeException exception){
         return getApiResponseObj(HttpStatus.INTERNAL_SERVER_ERROR,exception.getMessage());
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception){
         return getApiResponseObj(HttpStatus.BAD_REQUEST,exception.getMessage()+" | "+exception.getLocalizedMessage());
+    }
+    @ExceptionHandler(EntityExistsException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(EntityExistsException exception){
+        return getApiResponseObj(HttpStatus.BAD_REQUEST,exception.getMessage());
     }
 
     /// INternal FUnctions

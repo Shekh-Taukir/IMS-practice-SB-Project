@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.patient.dtos.base;
+package com.tsTech.practice.IMS_v2.common.dto.base;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
