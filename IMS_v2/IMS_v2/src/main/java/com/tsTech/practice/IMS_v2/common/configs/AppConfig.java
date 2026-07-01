@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.patient.configs;
+package com.tsTech.practice.IMS_v2.common.configs;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

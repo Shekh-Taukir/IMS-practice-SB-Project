@@ -12,6 +12,7 @@
 //
 // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 // v1.2 || type : Change || Jun 24, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
+// v1.3 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 ////////////////////////////////////////////////
 -->
 	<modelVersion>4.0.0</modelVersion>
@@ -41,6 +42,8 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<!--// Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)		-->
+		<org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,6 +90,13 @@
 			<artifactId>spring-boot-validation</artifactId>
 		</dependency>
 		<!--//End Jun 24, 2026 TaukirS (ER 1003 - validation and generalize response and error coding)-->
+		<!--//Start Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<!--//End Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
 	</dependencies>
 
 	<build>
@@ -119,6 +129,18 @@
 									<groupId>org.projectlombok</groupId>
 									<artifactId>lombok</artifactId>
 								</path>
+								<!--//Start Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok-mapstruct-binding</artifactId>
+									<version>0.2.0</version>
+								</path>
+								<path>
+									<groupId>org.mapstruct</groupId>
+									<artifactId>mapstruct-processor</artifactId>
+									<version>${org.mapstruct.version}</version>
+								</path>
+								<!--//End Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
 							</annotationProcessorPaths>
 						</configuration>
 					</execution>
@@ -134,6 +156,18 @@
 									<groupId>org.projectlombok</groupId>
 									<artifactId>lombok</artifactId>
 								</path>
+								<!--//Start Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok-mapstruct-binding</artifactId>
+									<version>0.2.0</version>
+								</path>
+								<path>
+									<groupId>org.mapstruct</groupId>
+									<artifactId>mapstruct-processor</artifactId>
+									<version>${org.mapstruct.version}</version>
+								</path>
+								<!--//End Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
 							</annotationProcessorPaths>
 						</configuration>
 					</execution>

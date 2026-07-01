@@ -6,16 +6,14 @@ import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.entities.PatientInsurance;
 import com.tsTech.practice.IMS_v2.patient.enums.InsurancePriority;
+import com.tsTech.practice.IMS_v2.patient.mapper.InsuranceMapper;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientInsuranceRepository;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientRepository;
 import com.tsTech.practice.IMS_v2.patient.service.PatientInsuranceService;
 import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -32,6 +30,7 @@ import java.util.Set;
 // Version history:
 //
 // v1.1 || type : Change || Jul 01, 2026 || TaukirS (ER 1005 - patient insurance setup)
+// v1.2 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 ////////////////////////////////////////////////
 
 @Service
@@ -40,26 +39,30 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
 
     private final PatientInsuranceRepository patientInsuranceRepository;
     private final PatientRepository patientRepository;
-    private final ModelMapper modelMapper;
+    //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+    private final InsuranceMapper insuranceMapper;
 
     @Override
     public List<PatientInsuranceDTO> getAllInsuranceByPatient(Long patientId) {
         return patientInsuranceRepository
                 .findByPatient_TranId(patientId)
                 .stream()
-                .map(insuranceDto -> modelMapper.map(insuranceDto, PatientInsuranceDTO.class))
+                //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+                .map(insurance -> insuranceMapper.toDto(insurance))
                 .toList();
     }
 
     @Override
     public PatientInsuranceDTO getPatientInsuranceById(Long insId) {
-        return modelMapper.map(patientInsuranceRepository.getPatientInsuranceEntityById(insId), PatientInsuranceDTO.class);
+        //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+        return insuranceMapper.toDto(patientInsuranceRepository.getPatientInsuranceEntityById(insId));
     }
 
     @Override
     public PatientInsuranceDTO addPatientInsuranceById(PatientInsuranceDTO patientInsuranceDTO) {
         Long patientId = patientInsuranceDTO.getPatientId();
-        PatientInsurance patientInsurance = modelMapper.map(patientInsuranceDTO, PatientInsurance.class);
+        //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+        PatientInsurance patientInsurance = insuranceMapper.toEntity(patientInsuranceDTO);
         Patient patient = patientRepository.getPatientEntityById(patientId);
 
         /// have to check that incoming priority is not set in any other insurance for that patient, other than OTHER priority
@@ -69,7 +72,8 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
 
         patientInsurance.setPatient(patient);
 
-        return modelMapper.map(patientInsuranceRepository.save(patientInsurance), PatientInsuranceDTO.class);
+        //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+        return insuranceMapper.toDto(patientInsuranceRepository.save(patientInsurance));
     }
 
     @Override
@@ -83,11 +87,13 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
     public PatientInsuranceDTO putPatientInsuranceById(Long insId, PatientInsuranceDTO insuranceDTO) {
         PatientInsurance insurance = patientInsuranceRepository.getPatientInsuranceEntityById(insId);
         insuranceDTO.setTranId(insId);
+        //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         /// Bug here, modelMapper is changing the value of insurance.patient.tran_id to insuranceDTO.tranId, and due to that exception occurs,
         /// so have to switch to Mapstruct from modelMapper.
-        modelMapper.map(insuranceDTO, insurance);
+        insuranceMapper.updateEntityFromDto(insuranceDTO, insurance);
+//        modelMapper.map(insuranceDTO, insurance);
         PatientInsurance newInsurance = patientInsuranceRepository.save(insurance);
-        return modelMapper.map(newInsurance, PatientInsuranceDTO.class);
+        return insuranceMapper.toDto(newInsurance);
     }
 
     @Override
@@ -107,7 +113,8 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
                 ReflectionUtils.setField(field, insurance, value);
         });
 
-        return modelMapper.map(patientInsuranceRepository.save(insurance), PatientInsuranceDTO.class);
+        //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
+        return insuranceMapper.toDto(patientInsuranceRepository.save(insurance));
     }
 
     @Override
