@@ -5,10 +5,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.tsTech.practice.IMS_v2.common.dto.base.BaseDTO;
 import com.tsTech.practice.IMS_v2.patient.enums.InsurancePriority;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -28,6 +25,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonPropertyOrder({"tranId"})
+@ToString
 public class PatientInsuranceDTO extends BaseDTO {
     private String planName;
     private String planCode;

@@ -1,6 +1,7 @@
 package com.tsTech.practice.IMS_v2.patient.controllers;
 
-import com.tsTech.practice.IMS_v2.patient.dtos.PatientDTO;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientResponse;
 import com.tsTech.practice.IMS_v2.patient.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,42 +23,44 @@ import java.util.Map;
 // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
 // v1.2 || type : Change || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 // v1.3 || type : Change || Jun 25, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
+// v1.4 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 ////////////////////////////////////////////////
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/patient")
+@RequestMapping("/v1/patient") //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes) - added v1/ in the patient base url
 public class PatientController {
 
     private final PatientService patientService;
+    private final String idUrl = "/{id}";      //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
 
     @GetMapping("")
-    public ResponseEntity<List<PatientDTO>> getAllPatients(){
+    public ResponseEntity<List<PatientResponse>> getAllPatients(){
         return ResponseEntity.ok(patientService.getAllPatients());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PatientDTO> getPatientById(@PathVariable(name = "id") Long tranId){
-        return ResponseEntity.ok(patientService.getPatientById(tranId));
+    @GetMapping(idUrl)
+    public ResponseEntity<PatientResponse> getPatientById(@PathVariable(name = "id") Long patientId){
+        return ResponseEntity.ok(patientService.getPatientById(patientId));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<PatientDTO> addPatient(@Valid @RequestBody PatientDTO patientDTO){
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.addPatient(patientDTO));
+    @PostMapping("")
+    public ResponseEntity<PatientResponse> addPatient(@Valid @RequestBody PatientRequest patientRequest){
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientService.addPatient(patientRequest));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PatientDTO> updatePatientById(@PathVariable("id") Long tranId, @Valid @RequestBody PatientDTO patientDTO){
-        return ResponseEntity.ok(patientService.updatePatientById(tranId, patientDTO));
+    @PutMapping(idUrl)
+    public ResponseEntity<PatientResponse> updatePatientById(@PathVariable("id") Long patientId, @Valid @RequestBody PatientRequest patientRequest){
+        return ResponseEntity.ok(patientService.updatePatientById(patientId, patientRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deletePatientById(@PathVariable("id") Long tranId){
-        return ResponseEntity.ok(patientService.deletePatientById(tranId));
+    @DeleteMapping(idUrl)
+    public ResponseEntity<Boolean> deletePatientById(@PathVariable("id") Long patientId){
+        return ResponseEntity.ok(patientService.deletePatientById(patientId));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PatientDTO> patchPatientById(@PathVariable("id") Long tranId, @RequestBody Map<String, Object> patchData){
-        return ResponseEntity.ok(patientService.patchPatientById(tranId, patchData));
+    @PatchMapping(idUrl)
+    public ResponseEntity<PatientResponse> patchPatientById(@PathVariable("id") Long patientId, @RequestBody Map<String, Object> patchData){
+        return ResponseEntity.ok(patientService.patchPatientById(patientId, patchData));
     }
 }

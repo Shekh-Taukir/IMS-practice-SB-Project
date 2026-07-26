@@ -19,6 +19,7 @@ import java.time.LocalDate;
 // Version history:
 //
 // v1.1 || type : Change || Jun 29, 2026 || TaukirS (ER 1005 - patient insurance setup)
+// v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 ////////////////////////////////////////////////
 
 @Entity
@@ -28,11 +29,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Table(name = "patient_insurance_sb")
 public class PatientInsurance extends BaseEntity {
+
+    //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes) - added nullable = false for necessary fields
+    @Column(nullable = false)
     private String planName;
+
+    @Column(nullable = false)
     private String planCode;
+
     private Double copay;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private InsurancePriority priority;
 
     @ManyToOne(fetch = FetchType.LAZY)

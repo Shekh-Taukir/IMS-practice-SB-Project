@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
  // Version history:
 //
  // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
+// v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 ////////////////////////////////////////////////
 
 @MappedSuperclass
@@ -27,11 +28,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public abstract class BaseEntity {
 
+    //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
+    // TODO:    1. need to add Auditable entity fields in Base entity
+    //          2. need to createdBy and UpdatedBy field with static value
+    //          3. when spring security is added, then need to set actual createdBy and UpdatedBY fields
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tranId;
 
     @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

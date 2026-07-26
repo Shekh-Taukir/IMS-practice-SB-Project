@@ -1,8 +1,8 @@
 package com.tsTech.practice.IMS_v2.patient.controllers;
 
-import com.tsTech.practice.IMS_v2.common.advices.ApiResponse;
-import com.tsTech.practice.IMS_v2.patient.dtos.PatientInsuranceDTO;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceResponse;
 import com.tsTech.practice.IMS_v2.patient.service.PatientInsuranceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,47 +21,51 @@ import java.util.Map;
 // Version history:
 //
 // v1.1 || type : Change || Jun 25, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
+// v1.2 || type : Change || Jul 24, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 ////////////////////////////////////////////////
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/pat_ins")
+//Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes) - added /v1 and /{patId} as patient insurance is depended on patient entirely
+@RequestMapping("/v1/{patId}/pat_ins")
 public class PatientInsuranceController {
 
     private final PatientInsuranceService patientInsuranceService;
+    //Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
+    private final String idUrl = "/{id}";
 
-    @GetMapping("/list/{patId}")
-    public ResponseEntity<List<PatientInsuranceDTO>> getAllInsuranceByPatient(@PathVariable("patId") Long patientId) {
+    @GetMapping("/list")
+    public ResponseEntity<List<PatientInsuranceResponse>> getAllInsuranceByPatient(@PathVariable("patId") Long patientId) {
         return ResponseEntity.ok(patientInsuranceService.getAllInsuranceByPatient(patientId));
     }
 
-    @GetMapping("/nxt-priority/{patId}")
-    public ResponseEntity<NextPriorityRecord> getNextPriority (@PathVariable("patId") Long pat_id) {
-        return ResponseEntity.ok(patientInsuranceService.getNextPriority(pat_id));
+    @GetMapping("/nxt-priority")
+    public ResponseEntity<NextPriorityRecord> getNextPriority (@PathVariable("patId") Long patientId) {
+        return ResponseEntity.ok(patientInsuranceService.getNextPriority(patientId));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PatientInsuranceDTO> getPatientInsuranceById(@PathVariable("id") Long insId) {
-        return ResponseEntity.ok(patientInsuranceService.getPatientInsuranceById(insId));
+    @GetMapping(idUrl)
+    public ResponseEntity<PatientInsuranceResponse> getPatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId) {
+        return ResponseEntity.ok(patientInsuranceService.getPatientInsuranceById(patientId, insId));
     }
 
     @PostMapping("")
-    public ResponseEntity<PatientInsuranceDTO> addPatientInsuranceById(@RequestBody PatientInsuranceDTO patientInsuranceDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(patientInsuranceService.addPatientInsuranceById(patientInsuranceDTO));
+    public ResponseEntity<PatientInsuranceResponse> addPatientInsuranceById(@PathVariable("patId") Long patientId, @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(patientInsuranceService.addPatientInsuranceById(patientId, patientInsuranceRequest));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deletePatientInsuranceById(@PathVariable("id") Long insId) {
-        return ResponseEntity.status(HttpStatus.OK).body(patientInsuranceService.deletePatientInsuranceById(insId));
+    @DeleteMapping(idUrl)
+    public ResponseEntity<Boolean> deletePatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId) {
+        return ResponseEntity.status(HttpStatus.OK).body(patientInsuranceService.deletePatientInsuranceById(patientId, insId));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PatientInsuranceDTO> putPatientInsuranceById(@PathVariable("id") Long insId, @RequestBody PatientInsuranceDTO insuranceDTO) {
-        return ResponseEntity.ok(patientInsuranceService.putPatientInsuranceById(insId, insuranceDTO));
+    @PutMapping(idUrl)
+    public ResponseEntity<PatientInsuranceResponse> putPatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId, @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
+        return ResponseEntity.ok(patientInsuranceService.putPatientInsuranceById(patientId, insId, patientInsuranceRequest));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PatientInsuranceDTO> patchPatientInsuranceById(@PathVariable("id") Long insId, @RequestBody Map<String, Object> patchUpdates){
-        return ResponseEntity.ok(patientInsuranceService.patchPatientInsuranceById(insId, patchUpdates));
+    @PatchMapping(idUrl)
+    public ResponseEntity<PatientInsuranceResponse> patchPatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId, @RequestBody Map<String, Object> patchUpdates){
+        return ResponseEntity.ok(patientInsuranceService.patchPatientInsuranceById(patientId, insId, patchUpdates));
     }
 }

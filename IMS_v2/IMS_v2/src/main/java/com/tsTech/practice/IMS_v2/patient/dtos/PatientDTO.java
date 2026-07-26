@@ -9,10 +9,7 @@ import com.tsTech.practice.IMS_v2.common.entity.enums.UserSexualOrientation;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -30,6 +27,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonPropertyOrder({"tranId"})
