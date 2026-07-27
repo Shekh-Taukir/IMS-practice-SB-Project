@@ -50,7 +50,7 @@ public class PatientServiceImpl implements PatientService {
                 .stream()
                 //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
                 .map(patient -> patientMapper.fromEntityToResponse(patient))
-                .collect(Collectors.toList());
+                .toList();
 
         //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         logResult("List Retrieved","getAllPatients",null, null, patientResponseList);
@@ -65,7 +65,7 @@ public class PatientServiceImpl implements PatientService {
 
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         //Jun 29, 2026 TaukirS (ER 1005 - patient insurance setup)
-        /// made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
+        // made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
         PatientResponse patientResponse =  patientMapper.fromEntityToResponse(patientRepository.getPatientEntityById(patientId));
 
         //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -113,7 +113,7 @@ public class PatientServiceImpl implements PatientService {
         log.debug("Entering deletePatientById()");
 
         //Jun 29, 2026 TaukirS (ER 1005 - patient insurance setup)
-        /// made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
+        // made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
         Patient patient = patientRepository.getPatientEntityById(patientId);
         patientRepository.delete(patient);
 
@@ -153,7 +153,10 @@ public class PatientServiceImpl implements PatientService {
         //End Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
     }
 
-    /// Internal functions
+    // =========================================================================
+    //  Internal Helper Methods
+    // =========================================================================
+
     //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
     private void logResult(String action, String methodName, Long patientId, Object userData, Object dtoResult){
         String debugString = "Patient Mst | " + action + " | " + methodName + "()";

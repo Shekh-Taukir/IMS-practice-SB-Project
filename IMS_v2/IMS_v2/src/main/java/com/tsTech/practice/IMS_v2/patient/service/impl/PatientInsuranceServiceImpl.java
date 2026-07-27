@@ -1,6 +1,5 @@
 package com.tsTech.practice.IMS_v2.patient.service.impl;
 
-import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceRequest;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceResponse;
@@ -86,7 +85,7 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
         PatientInsurance patientInsurance = insuranceMapper.fromRequestToEntity(patientInsuranceRequest);
         Patient patient = patientRepository.getPatientEntityById(patientId);
 
-        /// have to check that incoming priority is not set in any other insurance for that patient, other than OTHER priority
+        // have to check that incoming priority is not set in any other insurance for that patient, other than OTHER priority
         if(patientInsuranceRequest.priority() != InsurancePriority.OTHER) {
             if (patientInsuranceRepository.existsByPatient_TranIdAndPriority(patientId, patientInsuranceRequest.priority())) {
                 log.error("Duplicate Entity Exception occurred | Method : addPatientInsuranceById() | Entity: Insurance Priority | patientId: {}", patientId);
@@ -125,11 +124,9 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
 
         PatientInsurance insurance = patientInsuranceRepository.getPatientInsuranceEntityById(patientId, insId);
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
-        // FIXME:   modelMapper is changing the value of insurance.patient.tran_id to insuranceDTO.tranId, and due to that exception occurs,
-        //          so have to switch to Mapstruct from modelMapper.
-        //          Bug Done
+        // REF:    [bug-fixed] modelMapper is changing the value of insurance.patient.tran_id to insuranceDTO.tranId, and due to that exception occurs,
+        //          so have to switch to MapStruct from modelMapper.
         insuranceMapper.updateEntityFromRequest(patientInsuranceRequest, insurance);
-//        modelMapper.map(insuranceDTO, insurance);
 
         PatientInsuranceResponse updatedInsurance = insuranceMapper.fromEntityToResponse(patientInsuranceRepository.save(insurance));
 
@@ -205,7 +202,10 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
     }
 
 
-    /// Internal functions
+    // =========================================================================
+    //  Internal Helper Methods
+    // =========================================================================
+
     //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
     private void logResult(String action, String methodName, Long insId, Long patientId, Object userData, Object dtoResult){
         String debugString = "Patient Insurance | " + action + " | " + methodName + "()";
