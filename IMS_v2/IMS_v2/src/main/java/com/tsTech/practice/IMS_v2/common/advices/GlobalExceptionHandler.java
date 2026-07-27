@@ -1,5 +1,6 @@
 package com.tsTech.practice.IMS_v2.common.advices;
 
+import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import java.util.*;
 //
 // v1.1 || type : New FUnc || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 // v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.3 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 ////////////////////////////////////////////////
 
 //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -33,14 +35,10 @@ import java.util.*;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final MessageSource messageSource;
-    public GlobalExceptionHandler(MessageSource messageSource) {
-        this.messageSource = messageSource;
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleInvalidArgumentException(MethodArgumentNotValidException exception, HttpServletRequest servletRequest){
 
+        /*
         List<String> subErrors = exception.getBindingResult()
                 .getAllErrors()
                 .stream()
@@ -58,57 +56,66 @@ public class GlobalExceptionHandler {
                     else
                         return error.getDefaultMessage();})
                 .toList();
+         */
+
+        //Start Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
+        List<ApiError.FieldError> subErrors = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error-> new ApiError.FieldError(error.getField(), error.getDefaultMessage()))
+                .toList();
+        //End Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Invalid Argument Exception occurred while adding / updating data | exception : ",servletRequest.getMethod(), servletRequest.getRequestURL(), exception);
-
-        return getApiResponseObj(HttpStatus.BAD_REQUEST, "Invalid Input Arguments provided!!", subErrors);
+        return getApiResponseObj(HttpStatus.BAD_REQUEST, "Invalid Input Arguments provided!!", "INVALID_USER_INPUT", subErrors);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<?>> handleResourceNotFound(ResourceNotFoundException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Resource not found Exception | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-
-        return getApiResponseObj(HttpStatus.NOT_FOUND, exception.getMessage());
+        return getApiResponseObj(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getResource()+"_NOT_FOUND");
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<?>> handleInternalServerError(RuntimeException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Internal Server Error occurred | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-
-        return getApiResponseObj(HttpStatus.INTERNAL_SERVER_ERROR,exception.getMessage());
+        return getApiResponseObj(HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), "SERVER_ERROR");
     }
 
+    //NOTE: following exception occurs when for an enum field, user provides empty string, and its cannot be matched with none of the enum values.
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
-        log.error("API => {}:{} | Http Message Not Readable Exception due to invalid user input in api | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-
-        return getApiResponseObj(HttpStatus.BAD_REQUEST,exception.getMessage()+" | "+exception.getLocalizedMessage());
+        log.error("API => {}:{} | Http Message Not Readable Exception due to invalid user input for 'Enum Field' in api | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
+        return getApiResponseObj(HttpStatus.BAD_REQUEST,"Invalid ENUM field value provided", "INVALID_USER_INPUT");
     }
 
-    @ExceptionHandler(EntityExistsException.class)
-    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(EntityExistsException exception, HttpServletRequest servletRequest){
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(DuplicateResourceException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Duplicate Entity exception while adding / altering data | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-
-        return getApiResponseObj(HttpStatus.BAD_REQUEST,exception.getMessage());
+        return getApiResponseObj(HttpStatus.CONFLICT, exception.getMessage(), exception.getErrorCode());
     }
 
-    /// INternal FUnctions
-    private ResponseEntity<ApiResponse<?>> getApiResponseObj(HttpStatus httpStatus, String message) {
-        return getApiResponseObj(httpStatus, message,null);
+    // =========================================================================
+    //  Internal Helper Methods
+    // =========================================================================
+
+    private ResponseEntity<ApiResponse<?>> getApiResponseObj(HttpStatus httpStatus, String message, String errorCode) {
+        return getApiResponseObj(httpStatus, message,errorCode, null);
     }
 
-    private ResponseEntity<ApiResponse<?>> getApiResponseObj(HttpStatus httpStatus, String message, List<String> subErrors) {
-        ApiError error = ApiError.builder()
-                .message(message)
+    private ResponseEntity<ApiResponse<?>> getApiResponseObj(HttpStatus httpStatus, String message, String errorCode, List<ApiError.FieldError> subErrors) {
+        if(errorCode.isBlank())
+            errorCode = httpStatus.toString();
+
+        ApiError error = ApiError.of(errorCode, message, subErrors);
+
+        return ResponseEntity
                 .status(httpStatus)
-                .subErrors(subErrors)
-                .build();
-
-        return ResponseEntity.status(httpStatus).body(new ApiResponse<>(error));
+                .body(new ApiResponse<>(error));
     }
 }

@@ -1,8 +1,8 @@
 package com.tsTech.practice.IMS_v2.patient.service;
 
 import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceResponse;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientInsuranceRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientInsuranceResponse;
 
 import java.util.List;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package com.tsTech.practice.IMS_v2.patient.service.impl;
 
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientResponse;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.mapper.PatientMapper;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientRepository;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 ////////////////////////////////////////////////
 //

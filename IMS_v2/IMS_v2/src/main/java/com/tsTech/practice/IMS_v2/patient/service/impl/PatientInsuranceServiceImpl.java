@@ -1,8 +1,9 @@
 package com.tsTech.practice.IMS_v2.patient.service.impl;
 
+import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceResponse;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientInsuranceRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientInsuranceResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.entities.PatientInsurance;
 import com.tsTech.practice.IMS_v2.patient.enums.InsurancePriority;
@@ -10,7 +11,6 @@ import com.tsTech.practice.IMS_v2.patient.mapper.InsuranceMapper;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientInsuranceRepository;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientRepository;
 import com.tsTech.practice.IMS_v2.patient.service.PatientInsuranceService;
-import jakarta.persistence.EntityExistsException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.ReflectionUtils;
@@ -33,6 +33,7 @@ import java.util.Set;
 // v1.1 || type : Change || Jul 01, 2026 || TaukirS (ER 1005 - patient insurance setup)
 // v1.2 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 // v1.3 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.4 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 ////////////////////////////////////////////////
 
 @Slf4j      //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -85,13 +86,10 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
         PatientInsurance patientInsurance = insuranceMapper.fromRequestToEntity(patientInsuranceRequest);
         Patient patient = patientRepository.getPatientEntityById(patientId);
 
+        //Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes) - moved the logic into function of checking duplicate priority exists
         // have to check that incoming priority is not set in any other insurance for that patient, other than OTHER priority
-        if(patientInsuranceRequest.priority() != InsurancePriority.OTHER) {
-            if (patientInsuranceRepository.existsByPatient_TranIdAndPriority(patientId, patientInsuranceRequest.priority())) {
-                log.error("Duplicate Entity Exception occurred | Method : addPatientInsuranceById() | Entity: Insurance Priority | patientId: {}", patientId);
-                throw new EntityExistsException("Selected Insurance priority is already been used.");
-            }
-        }
+        checkDuplicatePriority(patientId, patientInsuranceRequest.priority());
+
         patientInsurance.setPatient(patient);
 
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
@@ -123,6 +121,12 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
         log.debug("Entering putPatientInsuranceById | patientId: {} | insId : {}", patientId, insId);
 
         PatientInsurance insurance = patientInsuranceRepository.getPatientInsuranceEntityById(patientId, insId);
+
+        //REF:  [Bug Fixed] need to check priority is not overlapping with other insurance before updating the insurance data
+
+        if (insurance.getPriority()!=patientInsuranceRequest.priority())
+            checkDuplicatePriority(patientId, patientInsuranceRequest.priority());
+
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         // REF:    [bug-fixed] modelMapper is changing the value of insurance.patient.tran_id to insuranceDTO.tranId, and due to that exception occurs,
         //          so have to switch to MapStruct from modelMapper.
@@ -140,9 +144,9 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
     public PatientInsuranceResponse patchPatientInsuranceById(Long patientId, Long insId, Map<String, Object> patchUpdates) {
         //Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.debug("Entering patchPatientInsuranceById | patientId: {} | insId : {}", patientId, insId);
-
         PatientInsurance insurance = patientInsuranceRepository.getPatientInsuranceEntityById(patientId, insId);
 
+        //REF:  [Bug Fixed] need to check priority is not overlapping with other insurance before updating the insurance data
         patchUpdates.forEach((key, value) -> {
             Field field = ReflectionUtils.getRequiredField(PatientInsurance.class, key);
             field.setAccessible(true);
@@ -150,12 +154,16 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
             if(field.getType().isEnum()){
                 Class<Enum> enumType = (Class<Enum>) field.getType();
                 Enum enumValue = Enum.valueOf(enumType, value.toString());
+
+                //Start Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
+                if(enumType.equals(InsurancePriority.class))
+                    checkDuplicatePriority(patientId, (InsurancePriority) enumValue);
+                //End Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
                 ReflectionUtils.setField(field, insurance, enumValue);
             }
             else
                 ReflectionUtils.setField(field, insurance, value);
         });
-
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         PatientInsuranceResponse updatedInsurance = insuranceMapper.fromEntityToResponse(patientInsuranceRepository.save(insurance));
 
@@ -168,20 +176,18 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
     @Override
     public NextPriorityRecord getNextPriority(Long patientId){
 
-        //FIXME: retireve for patient:5, next priority showing: Other, and current are secondary, primary, quaternary,
-        // Issues:  1. sequence of current priorities are not proper.
-//                    => as in the frontend, the list will be helpfull in showing the used priorities in the dropdown, so order doesn't matter here
+        // REF: [Bug Fixed] Retrieve for patient:5, next priority showing: Other, and current are secondary, primary, quaternary,
+        //  Issues: 1. sequence of current priorities are not proper.
+//                      => as in the frontend, the list will be helpful in showing the used priorities in the dropdown, so order doesn't matter here
         //          2. ideally it should show tertiary, but showing other.
 //                      => fixed
 
         //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         String newPriority = InsurancePriority.OTHER.toString();
-
         log.debug("Entering getNextPriority | patientId: {}", patientId);
         //End Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
 
         Set<String> currentPriorities = new HashSet<>(patientInsuranceRepository.getCurrentPriorities(patientId));
-
         if (currentPriorities.isEmpty()) {
             //as there are no insurances added for this patient, so default priority should be primary for new insurance.
             newPriority = InsurancePriority.PRIMARY.toString();
@@ -192,7 +198,6 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
                     break;
                 }
         }
-
         NextPriorityRecord nextPriorityRecord = new NextPriorityRecord(newPriority, currentPriorities);
 
         //Start Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes) - added debug and trace logs
@@ -228,4 +233,18 @@ public class PatientInsuranceServiceImpl implements PatientInsuranceService {
         }
     }
     //End Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
+
+    //Start Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
+    private void checkDuplicatePriority(Long patientId, InsurancePriority newPriority){
+        //if new insurance request is other, then we don't need to check further for duplicate priority exists or not for that patient.
+        if(newPriority == InsurancePriority.OTHER)
+            return;
+
+        if (Boolean.TRUE.equals(patientInsuranceRepository.existsByPatient_TranIdAndPriority(patientId, newPriority))) {
+            log.debug("Duplicate Entity Exception occurred | Method : addPatientInsuranceById() | Entity: Insurance Priority | patientId: {}", patientId);
+
+            throw new DuplicateResourceException("DUPLICATE_INSURANCE_PRIORITY","Insurance with Priority: "+newPriority+" already exists for the patient : "+patientId);
+        }
+    }
+    //End Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 }

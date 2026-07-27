@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.patient.dtos.records;
+package com.tsTech.practice.IMS_v2.patient.dtos.records.request;
 
 import com.tsTech.practice.IMS_v2.patient.enums.InsurancePriority;
 import jakarta.persistence.Column;

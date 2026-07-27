@@ -1,5 +1,7 @@
 package com.tsTech.practice.IMS_v2.common.exception;
 
+import lombok.Getter;
+
 /////////////////////////////////////////////
 //
 // Name: Resource Not Found Exception
@@ -10,16 +12,23 @@ package com.tsTech.practice.IMS_v2.common.exception;
 //
 // v1.1 || type : New FUnc || Jun 24, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
 // v1.2 || type : Change || Jun 30, 2026 || TaukirS (ER 1005 - patient insurance setup)
+// v1.3 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 ////////////////////////////////////////////////
 
+@Getter
 public class ResourceNotFoundException extends RuntimeException{
-    public ResourceNotFoundException(String message) {
-        super(message);
+
+    private final String resource;
+    private final Long identifier;
+
+    public ResourceNotFoundException(String resource, Long identifier) {
+        super(resource+" not found for : "+identifier);
+        this.resource = resource;
+        this.identifier = identifier;
     }
 
     //Start Jun 30, 2026 TaukirS (ER 1005 - patient insurance setup)
-    /// FOr future,
-    ///Have to add this function for throwing patient not found, instead of writing it everywhere the same line.
+    //NOTE: FOr future, Have to add this function for throwing patient not found, instead of writing it everywhere the same line.
     /*
     public static ResourceNotFoundException forPatient(Long patientId) {
         return new ResourceNotFoundException("Patient not found for id: "+patientId);

@@ -1,6 +1,5 @@
-package com.tsTech.practice.IMS_v2.patient.dtos.records;
+package com.tsTech.practice.IMS_v2.patient.dtos.records.request;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.tsTech.practice.IMS_v2.common.annotations.EntityStringValidation;
 import com.tsTech.practice.IMS_v2.common.entity.enums.UserPrefixEnum;
 import com.tsTech.practice.IMS_v2.common.entity.enums.UserSexEnum;

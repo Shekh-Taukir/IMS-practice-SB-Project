@@ -25,7 +25,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     //Start Jul 01, 2026 TaukirS (ER 1005 - patient insurance setup)
     default Patient getPatientEntityById(Long tranId){
         return findById(tranId)
-                .orElseThrow(()-> new ResourceNotFoundException("Patient not found for id: " + tranId));
+                .orElseThrow(()-> new ResourceNotFoundException("Patient", tranId));
     }
     //End Jul 01, 2026 TaukirS (ER 1005 - patient insurance setup)
 }

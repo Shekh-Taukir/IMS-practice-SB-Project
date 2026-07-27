@@ -1,9 +1,10 @@
 package com.tsTech.practice.IMS_v2.patient.controllers;
 
 import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientInsuranceResponse;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientInsuranceRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientInsuranceResponse;
 import com.tsTech.practice.IMS_v2.patient.service.PatientInsuranceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class PatientInsuranceController {
     }
 
     @PostMapping("")
-    public ResponseEntity<PatientInsuranceResponse> addPatientInsuranceById(@PathVariable("patId") Long patientId, @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
+    public ResponseEntity<PatientInsuranceResponse> addPatientInsuranceById(@PathVariable("patId") Long patientId,@Valid @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientInsuranceService.addPatientInsuranceById(patientId, patientInsuranceRequest));
     }
 
@@ -60,7 +61,7 @@ public class PatientInsuranceController {
     }
 
     @PutMapping(idUrl)
-    public ResponseEntity<PatientInsuranceResponse> putPatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId, @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
+    public ResponseEntity<PatientInsuranceResponse> putPatientInsuranceById(@PathVariable("patId") Long patientId, @PathVariable("id") Long insId, @Valid @RequestBody PatientInsuranceRequest patientInsuranceRequest) {
         return ResponseEntity.ok(patientInsuranceService.putPatientInsuranceById(patientId, insId, patientInsuranceRequest));
     }
 

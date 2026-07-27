@@ -2,8 +2,8 @@ package com.tsTech.practice.IMS_v2.patient.mapper;
 
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.BaseRecordMapper;
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.GenericMapper;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.PatientResponse;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientRequest;
+import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

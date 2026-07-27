@@ -28,7 +28,7 @@ public interface PatientInsuranceRepository extends JpaRepository<PatientInsuran
 
     default PatientInsurance getPatientInsuranceEntityById(Long patientId, Long insId){
         return findByPatient_TranIdAndTranId(patientId, insId)
-                .orElseThrow(()-> new ResourceNotFoundException("Insurance not found for insId: "+insId));
+                .orElseThrow(()-> new ResourceNotFoundException("Insurance",insId));
     }
 
     //Jul 26, 2026 TaukirS (ER 1007 - logging and dto to record changes)
