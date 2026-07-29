@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 import java.util.*;
 
@@ -28,12 +29,21 @@ import java.util.*;
 // v1.1 || type : New FUnc || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 // v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 // v1.3 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
+// v1.4 || type : Change || Jul 28, 2026 || TaukirS (ER 1010 - office api setup changes)
 ////////////////////////////////////////////////
 
 //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    //Start Jul 29, 2026 TaukirS (ER 1010 - office api setup changes)
+    private final MessageSource messageSource;
+
+    public GlobalExceptionHandler(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+    //End Jul 29, 2026 TaukirS (ER 1010 - office api setup changes)
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<?>> handleInvalidArgumentException(MethodArgumentNotValidException exception, HttpServletRequest servletRequest){
@@ -62,7 +72,24 @@ public class GlobalExceptionHandler {
         List<ApiError.FieldError> subErrors = exception.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(error-> new ApiError.FieldError(error.getField(), error.getDefaultMessage()))
+                .map(error-> {
+                    //Start Jul 28, 2026 TaukirS (ER 1010 - office api setup changes)
+                    //Because EmptyStringValidation works on generalize message, that fetch template from ValidationMessage.properties file, and this logic injects the field name, and generate the message, eg:
+                    //{0} cannot be null or empty, so in {0}, respective field is injected i.e. fullName
+                    String message;
+
+                    if (error instanceof FieldError)
+                        message = messageSource.getMessage(
+                                error.getDefaultMessage(),
+                                new Object[]{error.getField()},
+                                error.getDefaultMessage(),
+                                LocaleContextHolder.getLocale());
+                    else
+                        message = error.getDefaultMessage();
+
+                    return new ApiError.FieldError(error.getField(), message);
+                })
+                //End Jul 28, 2026 TaukirS (ER 1010 - office api setup changes)
                 .toList();
         //End Jul 27, 2026 TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 
@@ -89,8 +116,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
-        log.error("API => {}:{} | Http Message Not Readable Exception due to invalid user input for 'Enum Field' in api | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-        return getApiResponseObj(HttpStatus.BAD_REQUEST,"Invalid ENUM field value provided", "INVALID_USER_INPUT");
+        log.error("API => {}:{} | Http Message Not Readable Exception due to invalid user input for invalid json data in api | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
+
+        String message = "Invalid user input provided eg: invalid data or invalid json data";
+
+        //Start Jul 29, 2026 TaukirS (ER 1010 - office api setup changes)
+        Throwable cause = exception.getCause();
+        if(cause instanceof InvalidFormatException ife && ife.getTargetType().isEnum()){
+
+            String fieldName = ife.getPath().isEmpty() ?
+                    "field" :
+                    ife.getPath().get(ife.getPath().size()-1).getPropertyName();
+
+            Object[] allowedValues = ife.getTargetType().getEnumConstants();
+
+            message = String.format(
+                    "Invalid value %s for field '%s'. Allowed values: %s",
+                    ife.getValue(), fieldName, Arrays.toString(allowedValues)
+            );
+        }
+        //End Jul 29, 2026 TaukirS (ER 1010 - office api setup changes)
+
+        return getApiResponseObj(HttpStatus.BAD_REQUEST, message, "INVALID_USER_INPUT");
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
