@@ -1,5 +1,10 @@
 package com.tsTech.practice.IMS_v2.patient.service.impl;
 
+import com.tsTech.practice.IMS_v2.office.entities.Office;
+import com.tsTech.practice.IMS_v2.office.entities.Provider;
+import com.tsTech.practice.IMS_v2.office.repository.OfficeRepository;
+import com.tsTech.practice.IMS_v2.office.repository.ProviderRepository;
+import com.tsTech.practice.IMS_v2.patient.dtos.projectionInterface.PatientProjection;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientRequest;
 import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
@@ -28,6 +33,7 @@ import java.util.Map;
 // v1.3 || type : Change || Jun 29, 2026 || TaukirS (ER 1005 - patient insurance setup)
 // v1.4 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 // v1.5 || type : Change || Jul 24, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.6 || type : Change || Jul 30, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ////////////////////////////////////////////////
 
 @Service
@@ -39,16 +45,24 @@ public class PatientServiceImpl implements PatientService {
     //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
     private final PatientMapper patientMapper;
 
+    //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+    private final OfficeRepository officeRepository;
+    private final ProviderRepository providerRepository;
+    //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+
+
     @Override
     public List<PatientResponse> getAllPatients() {
         //Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.debug("Entering getAllPatients()");
 
         List<PatientResponse> patientResponseList = patientRepository
-                .findAll()
+                //Aug 01, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient) - updated to PatientProjection as data retrieve mechanism
+                .findAllWithOfficeAndProvider()
                 .stream()
+                //Aug 01, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
                 //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
-                .map(patient -> patientMapper.fromEntityToResponse(patient))
+                .map(patientMapper::fromProjectionToResponse)
                 .toList();
 
         //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -65,7 +79,11 @@ public class PatientServiceImpl implements PatientService {
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         //Jun 29, 2026 TaukirS (ER 1005 - patient insurance setup)
         // made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
-        PatientResponse patientResponse =  patientMapper.fromEntityToResponse(patientRepository.getPatientEntityById(patientId));
+        //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+        PatientResponse patientResponse =  patientMapper.fromProjectionToResponse(
+                        patientRepository.getPatientWithOfficeAndProviderEntityById(patientId)
+        );
+        //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 
         //Start Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         logResult("Patient Retrieved","getPatientById", patientId, null, patientResponse);
@@ -79,6 +97,14 @@ public class PatientServiceImpl implements PatientService {
         log.debug("Entering addPatient()");
 
         Patient patient = patientMapper.fromRequestToEntity(patientRequest);
+        //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+        Office office = officeRepository.getEntityById(patientRequest.officeId());
+        Provider provider = providerRepository.getEntityByIdAndOffice(patientRequest.providerId(), patientRequest.officeId());
+
+        patient.setOffice(office);
+        patient.setProvider(provider);
+        //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         PatientResponse newPatient = patientMapper.fromEntityToResponse(patientRepository.save(patient));
 
@@ -96,7 +122,18 @@ public class PatientServiceImpl implements PatientService {
         //Jun 29, 2026 TaukirS (ER 1005 - patient insurance setup)
         /// made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
         Patient patient = patientRepository.getPatientEntityById(patientId);
-//        patientRequest.(patientId);
+        //Start Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+        if(!patient.getOffice().getTranId().equals(patientRequest.officeId())){
+            Office office = officeRepository.getEntityById(patientRequest.officeId());
+            patient.setOffice(office);
+        }
+
+        if(!patient.getProvider().getTranId().equals(patientRequest.providerId())){
+            Provider provider = providerRepository.getEntityByIdAndOffice(patientRequest.providerId(), patientRequest.officeId());
+            patient.setProvider(provider);
+        }
+        //End Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+
         //Start Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)
         patientMapper.updateEntityFromRequest(patientRequest, patient);
         PatientResponse updatedPatient =  patientMapper.fromEntityToResponse(patientRepository.save(patient));
@@ -125,22 +162,67 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponse patchPatientById(Long patientId, Map<String, Object> patchData) {
         //Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
-        log.debug("Entering patchPatientById()");
+        log.debug("Entering patchPatientById() for patient: {}", patientId);
 
         //Jun 29, 2026 TaukirS (ER 1005 - patient insurance setup)
         /// made the getPatientEntityByID function in repo, so that it can be used in other entity's service layer as well.
         Patient patient = patientRepository.getPatientEntityById(patientId);
 
-        patchData.forEach((key, value)->{
-            Field fieldToBeUpdated = ReflectionUtils.getRequiredField(Patient.class, key);
-            fieldToBeUpdated.setAccessible(true);
+        //Start Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+        boolean ibOfficeChange = patchData.containsKey("officeId");
+        boolean ibProviderChange = patchData.containsKey("providerId");
 
-            if(fieldToBeUpdated.getType().isEnum()){
-                Class<Enum> enumType = (Class<Enum>) fieldToBeUpdated.getType();
-                Enum enumValue = Enum.valueOf(enumType, value.toString());
-                ReflectionUtils.setField(fieldToBeUpdated, patient, enumValue);
-            } else
+        if(ibProviderChange || ibOfficeChange){
+            Long officeId = patchData.containsKey("officeId") ?
+                    Long.valueOf(patchData.get("officeId").toString()) :
+                    patient.getOffice().getTranId();
+
+            Long providerId = patchData.containsKey("providerId") ?
+                    Long.valueOf(patchData.get("providerId").toString()) :
+                    patient.getProvider().getTranId();
+
+            if(ibOfficeChange){
+                if(!officeId.equals(patient.getOffice().getTranId())){
+                    log.debug("Updating office for patient id: {} | officeId: {} | function : patchPatientById", patientId, officeId);
+
+                    providerRepository.checkProviderFallsUnderOffice(providerId, officeId);
+
+                    Office office = officeRepository.getEntityById(officeId);
+                    patient.setOffice(office);
+
+                    log.debug("Office updated in patient: {} | function : patchPatientById", patientId);
+                    log.trace("Office updated in patient id: {} | office : {} | function : patchPatientById", patientId, office);
+                }
+            }
+
+            if (ibProviderChange) {
+                if (!providerId.equals(patient.getProvider().getTranId())){
+                    log.debug("Updating provider for patient id: {} | providerId: {} | function : patchPatientById", patientId, providerId);
+
+                    Provider provider = providerRepository.getEntityByIdAndOffice(providerId, officeId);
+                    patient.setProvider(provider);
+
+                    log.debug("Provider updated in patient: {} | function : patchPatientById", patientId);
+                    log.trace("Provider updated in patient id: {} | provider : {} | function : patchPatientById", patientId, provider);
+                }
+            }
+        }
+        //End Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+
+        patchData.forEach((key, value)->{
+            if (key.equals("officeId") || key.equals("providerId")) {
+                //Aug 01, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient) - As office and provider calculation is done prior, so no need to calculate in the for each loop.
+                return;
+            } else {
+                Field fieldToBeUpdated = ReflectionUtils.getRequiredField(Patient.class, key);
+                fieldToBeUpdated.setAccessible(true);
+
+                if (fieldToBeUpdated.getType().isEnum()) {
+                    Class<Enum> enumType = (Class<Enum>) fieldToBeUpdated.getType();
+                    value = Enum.valueOf(enumType, value.toString());
+                }
                 ReflectionUtils.setField(fieldToBeUpdated, patient, value);
+            }
         });
 
         //Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)

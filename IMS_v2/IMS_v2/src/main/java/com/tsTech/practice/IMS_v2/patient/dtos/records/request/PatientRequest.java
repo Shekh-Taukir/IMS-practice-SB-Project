@@ -19,6 +19,7 @@ import java.time.LocalDate;
 // Version history:
 //
  // v1.1 || type : Change || Jul 24, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+ // v1.2 || type : Change || Jul 30, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ////////////////////////////////////////////////
 
 public record PatientRequest(
@@ -64,6 +65,14 @@ public record PatientRequest(
 
         @NotNull(message = "Sexual Orientation field cannot be null")
         @Enumerated(EnumType.STRING)
-        UserSexualOrientation sexualOrientation
+        UserSexualOrientation sexualOrientation,
+
+        //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+        @NotNull(message = "Office cannot be null")
+        Long officeId,
+
+        @NotNull(message = "Provider cannot be null")
+        Long providerId
+        //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ) {
 }

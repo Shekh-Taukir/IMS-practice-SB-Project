@@ -13,6 +13,7 @@
 // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1002 - patient mst apis)
 // v1.2 || type : Change || Jun 24, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
 // v1.3 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
+// v1.4 || type : Change || Jul 29, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ////////////////////////////////////////////////
 -->
 	<modelVersion>4.0.0</modelVersion>
@@ -99,6 +100,17 @@
 			<version>${org.mapstruct.version}</version>
 		</dependency>
 		<!--//End Jul 01, 2026 TaukirS (ER 1006 - mapStruct setup changes)-->
+
+<!--		//Start Jul 29, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-flyway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+<!--		//End Jul 29, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)-->
 	</dependencies>
 
 	<build>

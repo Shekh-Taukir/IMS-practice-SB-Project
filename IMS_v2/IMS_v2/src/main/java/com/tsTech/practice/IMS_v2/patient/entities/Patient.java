@@ -4,6 +4,8 @@ import com.tsTech.practice.IMS_v2.common.entity.base.BaseEntity;
 import com.tsTech.practice.IMS_v2.common.entity.enums.UserPrefixEnum;
 import com.tsTech.practice.IMS_v2.common.entity.enums.UserSexEnum;
 import com.tsTech.practice.IMS_v2.common.entity.enums.UserSexualOrientation;
+import com.tsTech.practice.IMS_v2.office.entities.Office;
+import com.tsTech.practice.IMS_v2.office.entities.Provider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -19,7 +21,8 @@ import java.time.LocalDate;
  // Version history:
 //
  // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
-// v1.1 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.3 || type : Change || Jul 29, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ////////////////////////////////////////////////
 
 @Entity
@@ -73,4 +76,13 @@ public class Patient extends BaseEntity {
     @Column(nullable = false, length = 20)
     private UserSexualOrientation sexualOrientation;
 
+    //Start Jul 29, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "office_id", nullable = false)
+    Office office;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provider_id", nullable = false)
+    Provider provider;
+    //End Jul 29, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 }

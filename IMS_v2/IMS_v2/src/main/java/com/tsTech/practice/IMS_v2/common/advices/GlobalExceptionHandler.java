@@ -1,5 +1,6 @@
 package com.tsTech.practice.IMS_v2.common.advices;
 
+import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityExistsException;
@@ -30,6 +31,7 @@ import java.util.*;
 // v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 // v1.3 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 // v1.4 || type : Change || Jul 28, 2026 || TaukirS (ER 1010 - office api setup changes)
+// v1.5 || type : Change || Jul 31, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 ////////////////////////////////////////////////
 
 //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -102,7 +104,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleResourceNotFound(ResourceNotFoundException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Resource not found Exception | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
-        return getApiResponseObj(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getResource()+"_NOT_FOUND");
+        //Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient) - errorCode should be in uppercase
+        return getApiResponseObj(HttpStatus.NOT_FOUND, exception.getMessage(), exception.getResource().toUpperCase()+"_NOT_FOUND");
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -143,9 +146,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(DuplicateResourceException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
-        log.error("API => {}:{} | Duplicate Entity exception while adding / altering data | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
+        log.error("API => {}:{} | Duplicate Entity exception while adding / altering data | exception : ",servletRequest.getMethod(), servletRequest.getRequestURL(),exception);
         return getApiResponseObj(HttpStatus.CONFLICT, exception.getMessage(), exception.getErrorCode());
     }
+
+    //Start Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+    @ExceptionHandler(BusinessValidationException.class)
+    public ResponseEntity<ApiResponse<?>> handleBusinessValidationException(BusinessValidationException exception, HttpServletRequest servletRequest){
+        log.error("API => {}:{} | Business logic violation error | exception : ", servletRequest.getMethod(), servletRequest.getRequestURL(), exception);
+        return getApiResponseObj(HttpStatus.UNPROCESSABLE_CONTENT, exception.getMessage(), exception.getErrorCode());
+    }
+    //End Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 
     // =========================================================================
     //  Internal Helper Methods
