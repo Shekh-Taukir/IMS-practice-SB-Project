@@ -1,9 +1,9 @@
 package com.tsTech.practice.IMS_v2.patient.service.impl;
 
 import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.NextPriorityRecord;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientInsuranceRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientInsuranceResponse;
+import com.tsTech.practice.IMS_v2.patient.dto.records.NextPriorityRecord;
+import com.tsTech.practice.IMS_v2.patient.dto.records.request.PatientInsuranceRequest;
+import com.tsTech.practice.IMS_v2.patient.dto.records.response.PatientInsuranceResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.entities.PatientInsurance;
 import com.tsTech.practice.IMS_v2.patient.enums.InsurancePriority;

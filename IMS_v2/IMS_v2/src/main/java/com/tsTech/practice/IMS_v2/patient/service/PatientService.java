@@ -1,7 +1,7 @@
 package com.tsTech.practice.IMS_v2.patient.service;
 
-import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
+import com.tsTech.practice.IMS_v2.patient.dto.records.request.PatientRequest;
+import com.tsTech.practice.IMS_v2.patient.dto.records.response.PatientResponse;
 
 import java.util.List;
 import java.util.Map;

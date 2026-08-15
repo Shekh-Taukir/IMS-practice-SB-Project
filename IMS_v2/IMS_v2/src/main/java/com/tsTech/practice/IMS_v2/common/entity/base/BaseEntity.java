@@ -6,6 +6,9 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -17,15 +20,16 @@ import java.time.LocalDateTime;
 //
  // Version history:
 //
- // v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
+// v1.1 || type : Change || Jun 18, 2026 || TaukirS (ER 1001 - patient mst setup)
 // v1.2 || type : Change || Jul 23, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.3 || type : Change || Aug 14, 2026 || TaukirS (ER 1012 - visit type entity code)
 ////////////////////////////////////////////////
 
-@MappedSuperclass
 @Getter
 @Setter
-@AllArgsConstructor
+@MappedSuperclass
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
     //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -37,14 +41,15 @@ public abstract class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tranId;
 
-    @CreationTimestamp
+    //Aug 14, 2026 TaukirS (ER 1012 - visit type entity code)
+    @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
+    //Aug 14, 2026 TaukirS (ER 1012 - visit type entity code)
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @ColumnDefault(value = "true")
     @JsonProperty("isActive")
     @Column(nullable = false)
     private Boolean isActive=true;

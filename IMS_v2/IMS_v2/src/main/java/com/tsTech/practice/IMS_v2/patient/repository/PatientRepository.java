@@ -1,11 +1,8 @@
 package com.tsTech.practice.IMS_v2.patient.repository;
 
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
-import com.tsTech.practice.IMS_v2.patient.dtos.projectionInterface.PatientProjection;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
+import com.tsTech.practice.IMS_v2.patient.dto.projectionInterface.PatientProjection;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
-import jakarta.validation.OverridesAttribute;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -63,10 +60,10 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
     }
 
     //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
-    @Query( sqlQuery + " where p.tranId = :patientId ")
+    @Query( sqlQuery + " where p.tranId = :patientId " )
     Optional<PatientProjection> findByIdWithOfficeAndProvider(@Param("patientId") Long patientId);
 
-    @Query( sqlQuery)
+    @Query( sqlQuery )
     List<PatientProjection> findAllWithOfficeAndProvider();
     //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 }

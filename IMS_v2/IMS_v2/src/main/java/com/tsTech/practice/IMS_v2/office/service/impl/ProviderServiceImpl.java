@@ -1,7 +1,7 @@
 package com.tsTech.practice.IMS_v2.office.service.impl;
 
-import com.tsTech.practice.IMS_v2.office.dtos.request.ProviderRequest;
-import com.tsTech.practice.IMS_v2.office.dtos.response.ProviderResponse;
+import com.tsTech.practice.IMS_v2.office.dto.request.ProviderRequest;
+import com.tsTech.practice.IMS_v2.office.dto.response.ProviderResponse;
 import com.tsTech.practice.IMS_v2.office.entities.Office;
 import com.tsTech.practice.IMS_v2.office.entities.Provider;
 import com.tsTech.practice.IMS_v2.office.mapper.ProviderMapper;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 ////////////////////////////////////////////////
 //

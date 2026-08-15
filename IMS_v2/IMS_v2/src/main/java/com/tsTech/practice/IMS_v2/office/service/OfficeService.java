@@ -1,8 +1,7 @@
 package com.tsTech.practice.IMS_v2.office.service;
 
-import com.tsTech.practice.IMS_v2.office.dtos.request.OfficeRequest;
-import com.tsTech.practice.IMS_v2.office.dtos.response.OfficeResponse;
-import jakarta.validation.Valid;
+import com.tsTech.practice.IMS_v2.office.dto.request.OfficeRequest;
+import com.tsTech.practice.IMS_v2.office.dto.response.OfficeResponse;
 
 import java.util.List;
 import java.util.Map;

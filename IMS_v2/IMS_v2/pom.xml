@@ -14,6 +14,7 @@
 // v1.2 || type : Change || Jun 24, 2026 || TaukirS (ER 1003 - validation and generalize response and error coding)
 // v1.3 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 // v1.4 || type : Change || Jul 29, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+// v1.5 || type : Change || Aug 16, 2026 || TaukirS (ER 1012 - visit type entity code)
 ////////////////////////////////////////////////
 -->
 	<modelVersion>4.0.0</modelVersion>
@@ -192,6 +193,14 @@
 				<artifactId>sonar-maven-plugin</artifactId>
 				<version>5.7.0.6970</version>
 			</plugin>
+			<!-- //Start Aug 16, 2026 TaukirS (ER 1012 - visit type entity code) -->
+			<!-- Plugin required, wherever we need to update the already executed migration file, and to match the checksum with flyway history table -->
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>12.4.0</version>
+			</plugin>
+			<!-- //End Aug 16, 2026 TaukirS (ER 1012 - visit type entity code) -->
 		</plugins>
 	</build>
 

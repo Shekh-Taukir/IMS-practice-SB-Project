@@ -2,9 +2,9 @@ package com.tsTech.practice.IMS_v2.patient.mapper;
 
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.BaseRecordMapper;
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.GenericMapper;
-import com.tsTech.practice.IMS_v2.patient.dtos.projectionInterface.PatientProjection;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.request.PatientRequest;
-import com.tsTech.practice.IMS_v2.patient.dtos.records.response.PatientResponse;
+import com.tsTech.practice.IMS_v2.patient.dto.projectionInterface.PatientProjection;
+import com.tsTech.practice.IMS_v2.patient.dto.records.request.PatientRequest;
+import com.tsTech.practice.IMS_v2.patient.dto.records.response.PatientResponse;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,6 +25,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = BaseRecordMapper.class)
 public interface PatientMapper extends GenericMapper<Patient, PatientRequest> {
+
     @Mapping(target = "baseRecord", source = "patient")
     //Start Aug 01, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
     @Mapping(target = "officeName", source = "patient.office.officeName")
