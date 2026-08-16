@@ -2,6 +2,7 @@ package com.tsTech.practice.IMS_v2.common.dto.record;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 // Version history:
 //
 // v1.1 || type : Change || Jul 24, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
+// v1.2 || type : Change || Aug 17, 2026 || TaukirS (ER 1013 - case master coding)
 ////////////////////////////////////////////////
 
 public record BaseRecord(
@@ -22,8 +24,6 @@ public record BaseRecord(
         // TODO:    1. Need to createdBy and updatedBY fields with default value for now.
         //          2. Once the spring security is implemented, then need to updated createdBy and updatedBy fields with actual login user with default value,
 
-        Long tranId,
-        
         @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")    //Jul 25, 2026 TaukirS (ER 1007 - logging and dto to record changes) - updated the date time format
         LocalDateTime createdAt,
         
@@ -32,7 +32,10 @@ public record BaseRecord(
 
         @JsonProperty("isActive")
         @NotNull(message = "isActive field cannot be null")
-        Boolean isActive
+        Boolean isActive,
+
+        //Aug 17, 2026 TaukirS (ER 1013 - case master coding) - moved tranId to bottom, so that for every response, in client, one can see tranId easily
+        Long tranId
 ) {
     //Jul 24, 2026 TaukirS (ER 1007 - logging and dto to record changes)
     // NOTE:    In base DTO, we use isActive = true, so don't need to set it true for every add api,

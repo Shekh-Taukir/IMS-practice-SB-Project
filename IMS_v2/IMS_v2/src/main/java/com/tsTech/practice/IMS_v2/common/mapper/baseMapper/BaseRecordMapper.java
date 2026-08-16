@@ -15,18 +15,21 @@ import org.mapstruct.Mapper;
 //
 // v1.1 || type : Change || Jul 24, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 // v1.2 || type : Change || Jul 30, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+// v1.3 || type : Change || Aug 17, 2026 || TaukirS (ER 1013 - case master coding)
 ////////////////////////////////////////////////
 
 @Mapper(componentModel = "spring")
 public interface BaseRecordMapper {
 
     default BaseRecord toBaseRecord(BaseEntity entity){
-        return new BaseRecord(entity.getTranId(), entity.getCreatedAt(), entity.getUpdatedAt(), entity.getIsActive());
+        //Aug 17, 2026 TaukirS (ER 1013 - case master coding) - moved tranId in BaseRecord at last, to find tranId easily while working on backend clients
+        return new BaseRecord(entity.getCreatedAt(), entity.getUpdatedAt(), entity.getIsActive(), entity.getTranId());
     }
 
     //Start Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
     default BaseRecord toBaseRecord(BaseProjection projection){
-        return new BaseRecord(projection.getTranId(), projection.getCreatedAt(), projection.getUpdatedAt(), projection.getIsActive());
+        //Aug 17, 2026 TaukirS (ER 1013 - case master coding)
+        return new BaseRecord(projection.getCreatedAt(), projection.getUpdatedAt(), projection.getIsActive(), projection.getTranId());
     }
     //End Jul 30, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 }
