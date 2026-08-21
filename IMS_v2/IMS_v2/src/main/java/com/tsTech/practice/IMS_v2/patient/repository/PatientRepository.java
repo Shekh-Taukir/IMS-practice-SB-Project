@@ -1,5 +1,6 @@
 package com.tsTech.practice.IMS_v2.patient.repository;
 
+import com.tsTech.practice.IMS_v2.common.constants.SqlQueryConstants;
 import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import com.tsTech.practice.IMS_v2.patient.dto.projectionInterface.PatientProjection;
@@ -24,23 +25,26 @@ import java.util.Optional;
 // v1.2 || type : Change || Jun 29, 2026 || TaukirS (ER 1005 - patient insurance setup)
 // v1.3 || type : Change || Jul 30, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 // v1.4 || type : Change || Aug 16, 2026 || TaukirS (ER 1013 - case master coding)
+// v1.5 || type : Change || Aug 21, 2026 || TaukirS (ER 1015 - visitnote entity coding)
 ////////////////////////////////////////////////
 
 @Repository
 public interface PatientRepository extends JpaRepository<Patient, Long> {
 
+    //Aug 21, 2026 TaukirS (ER 1015 - visitnote entity coding) - added query constants for office and provider name expression
     String sqlQuery ="""
             SELECT 
                 p.firstName AS firstName, p.lastName AS lastName, p.middleName AS middleName, p.aka AS aka, p.address1 as address1, 
                 p.address2 as address2, p.birthDate as birthDate, p.deceasedDate as deceasedDate, p.email as email, p.prefix as prefix, 
                 p.sex as sex, p.note as note, p.sexualOrientation as sexualOrientation, +
-                p.tranId as tranId, p.createdAt as createdAt, p.updatedAt as updatedAt, p.isActive as isActive, 
-                o.officeName as officeName, prov.lastName as providerName, o.tranId as officeId, prov.tranId as providerId 
+                p.tranId as tranId, p.createdAt as createdAt, p.updatedAt as updatedAt, p.isActive as isActive, """ +
+                SqlQueryConstants.OFFICE_NAME_EXPR +", "+SqlQueryConstants.PROVIDER_NAME_EXPR+"""
+                , off.tranId as officeId, prov.tranId as providerId 
             FROM 
                 Patient p 
             INNER JOIN 
-                Office o 
-                ON o.tranId = p.office.tranId 
+                Office off
+                ON off.tranId = p.office.tranId 
             INNER JOIN 
                 Provider prov 
                 ON prov.tranId = p.provider.tranId """;

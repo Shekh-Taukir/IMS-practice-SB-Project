@@ -1,10 +1,10 @@
 package com.tsTech.practice.IMS_v2.scheduler.repository;
 
+import com.tsTech.practice.IMS_v2.common.constants.SqlQueryConstants;
 import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import com.tsTech.practice.IMS_v2.scheduler.dto.projection.CaseProjection;
 import com.tsTech.practice.IMS_v2.scheduler.entities.Case;
-import io.micrometer.observation.aop.ObservationKeyValueAnnotationHandler;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,31 +23,33 @@ import java.util.function.Function;
 // Version history:
 //
 // v1.1 || type : Change || Aug 16, 2026 || TaukirS (ER 1013 - case master coding)
+// v1.2 || type : Change || Aug 21, 2026 || TaukirS (ER 1015 - visitnote entity coding)
 /////////////////////////////////////////////
 
 @Repository
 public interface CaseRepository extends JpaRepository<Case, Long> {
 
+    //Aug 21, 2026 TaukirS (ER 1015 - visitnote entity coding) - added query constants for office and patient name expression
     String sqlQueryP1 ="""
             SELECT 
                 c.name as name, c.description as description, c.note as note, 
-                p.tranId as patientId, o.tranId as officeId, 
-                p.lastName ||', '|| p.firstName as patientName, o.officeName ||' ('|| o.officeCode ||')' as officeName, +
-                c.tranId as tranId, c.createdAt as createdAt, c.updatedAt as updatedAt, c.isActive as isActive 
+                pat.tranId as patientId, off.tranId as officeId, """+
+                SqlQueryConstants.PATIENT_NAME_EXPR +","+SqlQueryConstants.OFFICE_NAME_EXPR+"""
+                ,c.tranId as tranId, c.createdAt as createdAt, c.updatedAt as updatedAt, c.isActive as isActive 
             FROM 
                 Case c 
             INNER JOIN 
-                Patient p 
-                ON p.tranId = c.patient.tranId
+                Patient pat 
+                ON pat.tranId = c.patient.tranId
             """;
 
     String sqlQueryP2 ="""
             INNER JOIN 
-                Office o 
-                ON o.tranId = c.office.tranId
+                Office off 
+                ON off.tranId = c.office.tranId
             """;
 
-    @Query(sqlQueryP1 +" and p.tranId = :patientId "+ sqlQueryP2 + " ORDER BY c.tranId desc ")
+    @Query(sqlQueryP1 +" and pat.tranId = :patientId "+ sqlQueryP2 + " ORDER BY c.tranId desc ")
     List<CaseProjection> findAllWithPatientAndOffice(@Param("patientId") Long patientId);
 
     @Query(sqlQueryP1 + sqlQueryP2 +" WHERE c.tranId = :caseId ")
