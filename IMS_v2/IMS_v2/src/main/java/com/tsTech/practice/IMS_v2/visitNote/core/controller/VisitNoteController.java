@@ -1,8 +1,8 @@
-package com.tsTech.practice.IMS_v2.visitNote.controller;
+package com.tsTech.practice.IMS_v2.visitNote.core.controller;
 
-import com.tsTech.practice.IMS_v2.visitNote.dto.request.VisitNoteRequest;
-import com.tsTech.practice.IMS_v2.visitNote.dto.response.VisitNoteResponse;
-import com.tsTech.practice.IMS_v2.visitNote.service.VisitNoteService;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.request.VisitNoteRequest;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.response.VisitNoteResponse;
+import com.tsTech.practice.IMS_v2.visitNote.core.service.VisitNoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

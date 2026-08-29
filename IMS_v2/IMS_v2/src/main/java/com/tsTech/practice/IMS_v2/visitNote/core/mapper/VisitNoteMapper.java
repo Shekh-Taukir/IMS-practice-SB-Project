@@ -1,11 +1,11 @@
-package com.tsTech.practice.IMS_v2.visitNote.mapper;
+package com.tsTech.practice.IMS_v2.visitNote.core.mapper;
 
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.BaseRecordMapper;
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.GenericMapper;
-import com.tsTech.practice.IMS_v2.visitNote.dto.projection.VisitNoteProjection;
-import com.tsTech.practice.IMS_v2.visitNote.dto.request.VisitNoteRequest;
-import com.tsTech.practice.IMS_v2.visitNote.dto.response.VisitNoteResponse;
-import com.tsTech.practice.IMS_v2.visitNote.entities.VisitNote;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.projection.VisitNoteProjection;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.request.VisitNoteRequest;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.response.VisitNoteResponse;
+import com.tsTech.practice.IMS_v2.visitNote.core.entities.VisitNote;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

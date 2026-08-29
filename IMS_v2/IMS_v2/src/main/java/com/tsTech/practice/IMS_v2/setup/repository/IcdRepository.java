@@ -3,8 +3,12 @@ package com.tsTech.practice.IMS_v2.setup.repository;
 import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
 import com.tsTech.practice.IMS_v2.setup.entities.ICD;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /////////////////////////////////////////////
 //
@@ -21,6 +25,15 @@ import org.springframework.stereotype.Repository;
 public interface IcdRepository extends JpaRepository<ICD, Long> {
 
     boolean existsByCode(String code);
+
+    List<ICD> findTop20ByOrderByCodeAsc();
+
+    List<ICD> findTop20ByCodeContainingOrDescriptionContainingIgnoreCaseOrderByCodeAsc(String code, String description);
+    List<ICD> findByCodeContainingOrDescriptionContainingIgnoreCase(String code, String description);
+
+    // =========================================================================
+    //  Default Methods
+    // =========================================================================
 
     default void checkIcdCodeExistsOrThrow(String code){
         code = code.trim().toUpperCase();

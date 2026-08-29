@@ -1,11 +1,14 @@
 package com.tsTech.practice.IMS_v2.setup.service.impl;
 
+import com.tsTech.practice.IMS_v2.setup.dto.request.IcdBulkRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.request.IcdRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.response.IcdResponse;
+import com.tsTech.practice.IMS_v2.setup.dto.response.IcdSearchResponse;
 import com.tsTech.practice.IMS_v2.setup.entities.ICD;
 import com.tsTech.practice.IMS_v2.setup.mapper.IcdMapper;
 import com.tsTech.practice.IMS_v2.setup.repository.IcdRepository;
 import com.tsTech.practice.IMS_v2.setup.service.IcdService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.ReflectionUtils;
@@ -26,6 +29,7 @@ import java.util.Map;
 // Version history:
 //
 // v1.1 || type : Change || Aug 17, 2026 || TaukirS (ER 1014 - icd entity setup coding)
+// v1.2 || type : Change || Aug 22, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 /////////////////////////////////////////////
 
 @Slf4j
@@ -50,6 +54,29 @@ public class IcdServiceImpl implements IcdService {
         return response;
     }
 
+    //Start Aug 22, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    @Override
+    @Transactional
+    public List<IcdResponse> createIcdByJsonList(IcdBulkRequest request) {
+        log.debug("Entering createIcdByJsonList()");
+
+        List<ICD> icdList = request.icdRequestList().stream()
+                .map(icdItem->{
+                    icdRepository.checkIcdCodeExistsOrThrow(icdItem.code());
+                    return icdMapper.fromRequestToEntity(icdItem);
+                })
+                .toList();
+
+        List<IcdResponse> response = icdRepository.saveAll(icdList)
+                .stream()
+                .map(icdMapper::toResponse)
+                .toList();
+
+        logResult("Create Icd in bulk from JSON List", "createIcdByJsonList", null, request, response);
+        return response;
+    }
+    //End Aug 22, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+
     @Override
     public IcdResponse getIcdById(Long icdId) {
         log.debug("Entering getIcdById() | icdId: {}", icdId);
@@ -61,14 +88,40 @@ public class IcdServiceImpl implements IcdService {
         return response;
     }
 
+    //Start Aug 21, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    //updated the repo function, to add search functionality for icd list api
     @Override
-    public List<IcdResponse> getIcdList() {
+    public List<IcdResponse> getIcdList(String keyword) {
         log.debug("Entering getIcdList()");
-        List<IcdResponse> responseList = icdMapper.toResponseList(icdRepository.findAll());
+        boolean isSearchBlank = (keyword == null || keyword.isBlank());
 
-        logResult("Retrieved List", "getIcdList", null, null, responseList);
-        return responseList;
+        List<IcdResponse> response = icdMapper.toResponseList(
+                isSearchBlank ?
+                        icdRepository.findAll() :
+                        icdRepository.findByCodeContainingOrDescriptionContainingIgnoreCase(keyword.toUpperCase(), keyword)
+        );
+
+        logResult("Retrieved List", "getIcdList", null, isSearchBlank? null: "searched for keyword: "+keyword, response);
+        return response;
     }
+
+    //added new light-weight search api that returns top 20 based on keyword searched
+    @Override
+    public List<IcdSearchResponse> getIcdListBySearch(String keyword) {
+        log.debug("Entering getIcdListBySearch()");
+        boolean isSearchBlank = false;
+
+        if(keyword==null || keyword.isBlank())
+            isSearchBlank = true;
+        List<IcdSearchResponse> response = icdMapper.toSearchResponseList( isSearchBlank ?
+                        icdRepository.findTop20ByOrderByCodeAsc() :
+                        icdRepository.findTop20ByCodeContainingOrDescriptionContainingIgnoreCaseOrderByCodeAsc(keyword.toUpperCase(), keyword)
+        );
+
+        logResult("Retrieved List", "getIcdListBySearch", null, isSearchBlank? null: "searched for keyword: "+keyword, response);
+        return response;
+    }
+    //End Aug 21, 2026 TaukirS (ER 1016 - diagnosis entity coding)
 
     @Override
     @Transactional

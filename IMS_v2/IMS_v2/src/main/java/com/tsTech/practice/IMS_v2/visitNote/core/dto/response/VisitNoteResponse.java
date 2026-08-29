@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.visitNote.dto.response;
+package com.tsTech.practice.IMS_v2.visitNote.core.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.tsTech.practice.IMS_v2.common.dto.record.BaseRecord;

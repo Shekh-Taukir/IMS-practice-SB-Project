@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.visitNote.entities;
+package com.tsTech.practice.IMS_v2.visitNote.core.entities;
 
 import com.tsTech.practice.IMS_v2.common.entity.base.BaseEntity;
 import com.tsTech.practice.IMS_v2.office.entities.Office;

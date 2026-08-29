@@ -1,8 +1,7 @@
-package com.tsTech.practice.IMS_v2.visitNote.service;
+package com.tsTech.practice.IMS_v2.visitNote.core.service;
 
-import com.tsTech.practice.IMS_v2.visitNote.dto.request.VisitNoteRequest;
-import com.tsTech.practice.IMS_v2.visitNote.dto.response.VisitNoteResponse;
-import jakarta.validation.Valid;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.request.VisitNoteRequest;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.response.VisitNoteResponse;
 
 import java.util.List;
 import java.util.Map;

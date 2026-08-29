@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.visitNote.service.impl;
+package com.tsTech.practice.IMS_v2.visitNote.core.service.impl;
 
 import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.office.entities.Provider;
@@ -7,13 +7,12 @@ import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientRepository;
 import com.tsTech.practice.IMS_v2.setup.entities.VisitType;
 import com.tsTech.practice.IMS_v2.setup.repository.VisitTypeRepository;
-import com.tsTech.practice.IMS_v2.visitNote.dto.request.VisitNoteRequest;
-import com.tsTech.practice.IMS_v2.visitNote.dto.response.VisitNoteResponse;
-import com.tsTech.practice.IMS_v2.visitNote.entities.VisitNote;
-import com.tsTech.practice.IMS_v2.visitNote.mapper.VisitNoteMapper;
-import com.tsTech.practice.IMS_v2.visitNote.repository.VisitNoteRepository;
-import com.tsTech.practice.IMS_v2.visitNote.service.VisitNoteService;
-import jakarta.validation.Valid;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.request.VisitNoteRequest;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.response.VisitNoteResponse;
+import com.tsTech.practice.IMS_v2.visitNote.core.entities.VisitNote;
+import com.tsTech.practice.IMS_v2.visitNote.core.mapper.VisitNoteMapper;
+import com.tsTech.practice.IMS_v2.visitNote.core.repository.VisitNoteRepository;
+import com.tsTech.practice.IMS_v2.visitNote.core.service.VisitNoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.ReflectionUtils;

@@ -1,11 +1,10 @@
-package com.tsTech.practice.IMS_v2.visitNote.repository;
+package com.tsTech.practice.IMS_v2.visitNote.core.repository;
 
 import com.tsTech.practice.IMS_v2.common.constants.SqlQueryConstants;
 import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
-import com.tsTech.practice.IMS_v2.visitNote.dto.projection.VisitNoteProjection;
-import com.tsTech.practice.IMS_v2.visitNote.entities.VisitNote;
-import lombok.extern.slf4j.Slf4j;
+import com.tsTech.practice.IMS_v2.visitNote.core.dto.projection.VisitNoteProjection;
+import com.tsTech.practice.IMS_v2.visitNote.core.entities.VisitNote;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.ToLongFunction;
 
 /////////////////////////////////////////////
 //
@@ -25,6 +23,7 @@ import java.util.function.ToLongFunction;
 // Version history:
 //
 // v1.1 || type : Change || Aug 20, 2026 || TaukirS (ER 1015 - visitnote entity coding)
+// v1.2 || type : Change || Aug 21, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 /////////////////////////////////////////////
 
 @Repository
@@ -92,8 +91,15 @@ public interface VisitNoteRepository extends JpaRepository<VisitNote, Long> {
         return getGenericVisitNoteById(findVisitNoteById(pnId), patientId, pnId, v->v.getPatientId());
     }
 
+    //Start Aug 21, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    default VisitNote getVisitNoteEntityById(Long pnId){
+        return findById(pnId)
+                .orElseThrow(()->visitNoteNotFound(pnId));
+    }
+    //End Aug 21, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+
     default <T> T getGenericVisitNoteById(Optional<T> result, Long patientId, Long pnId, Function<T, Long> patientIdExtractor){
-        T entity = result.orElseThrow(()-> new ResourceNotFoundException("visit_note", pnId));
+        T entity = result.orElseThrow(()-> visitNoteNotFound(pnId));
 
         if(!(patientIdExtractor.apply(entity).equals(patientId)))
             throw new BusinessValidationException("Visit of ID: "+pnId+" is not of patient_id: "+patientId, "PATIENT_VISIT_MISMATCH");
@@ -101,4 +107,16 @@ public interface VisitNoteRepository extends JpaRepository<VisitNote, Long> {
         return entity;
     }
 
+    //Start Aug 22, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    default boolean checkVisitNoteExistsById(Long pnId){
+        if(!existsById(pnId))
+            throw visitNoteNotFound(pnId);
+
+        return true;
+    }
+
+    private ResourceNotFoundException visitNoteNotFound(Long pnId){
+        return new ResourceNotFoundException("visit_note", pnId);
+    }
+    //End Aug 22, 2026 TaukirS (ER 1016 - diagnosis entity coding)
 }

@@ -1,7 +1,9 @@
 package com.tsTech.practice.IMS_v2.setup.controller;
 
+import com.tsTech.practice.IMS_v2.setup.dto.request.IcdBulkRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.request.IcdRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.response.IcdResponse;
+import com.tsTech.practice.IMS_v2.setup.dto.response.IcdSearchResponse;
 import com.tsTech.practice.IMS_v2.setup.service.IcdService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import java.util.Map;
 // Version history:
 //
 // v1.1 || type : Change || Aug 17, 2026 || TaukirS (ER 1014 - icd entity setup coding)
+// v1.2 || type : Change || Aug 22, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 /////////////////////////////////////////////
 
 @RestController
@@ -35,6 +38,10 @@ public class IcdController {
     public ResponseEntity<IcdResponse> createIcd(@Valid @RequestBody IcdRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(icdService.createIcd(request));
     }
+    @PostMapping("/json_bulk")
+    public ResponseEntity<List<IcdResponse>> createIcdByJsonList(@Valid @RequestBody IcdBulkRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(icdService.createIcdByJsonList(request));
+    }
 
     @GetMapping(ID_URL)
     public ResponseEntity<IcdResponse> getIcdById(@PathVariable("id") Long icdId){
@@ -42,8 +49,13 @@ public class IcdController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<IcdResponse>> getIcdList(){
-        return ResponseEntity.ok(icdService.getIcdList());
+    public ResponseEntity<List<IcdResponse>> getIcdList(@RequestParam(required = false) String keyword){
+        return ResponseEntity.ok(icdService.getIcdList(keyword));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<IcdSearchResponse>> getIcdListBySearch(@RequestParam(required = false) String keyword){
+        return ResponseEntity.ok(icdService.getIcdListBySearch(keyword));
     }
 
     @PutMapping(ID_URL)

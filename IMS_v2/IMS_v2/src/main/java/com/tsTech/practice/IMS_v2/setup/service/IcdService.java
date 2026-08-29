@@ -1,7 +1,9 @@
 package com.tsTech.practice.IMS_v2.setup.service;
 
+import com.tsTech.practice.IMS_v2.setup.dto.request.IcdBulkRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.request.IcdRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.response.IcdResponse;
+import com.tsTech.practice.IMS_v2.setup.dto.response.IcdSearchResponse;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -21,9 +23,13 @@ import java.util.Map;
 public interface IcdService {
     IcdResponse createIcd(IcdRequest request);
 
+    List<IcdResponse> createIcdByJsonList(IcdBulkRequest request);
+
     IcdResponse getIcdById(Long icdId);
 
-    List<IcdResponse> getIcdList();
+    List<IcdResponse> getIcdList(String keyword);
+
+    List<IcdSearchResponse> getIcdListBySearch(String keyword);
 
     IcdResponse updateIcd(Long icdId, IcdRequest request);
 

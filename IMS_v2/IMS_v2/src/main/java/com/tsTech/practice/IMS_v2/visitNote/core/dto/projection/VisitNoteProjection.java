@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.visitNote.dto.projection;
+package com.tsTech.practice.IMS_v2.visitNote.core.dto.projection;
 
 import com.tsTech.practice.IMS_v2.common.dto.projectionInterface.BaseProjection;
 

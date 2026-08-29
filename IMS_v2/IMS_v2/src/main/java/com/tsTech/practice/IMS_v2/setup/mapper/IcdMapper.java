@@ -4,8 +4,10 @@ import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.BaseRecordMapper;
 import com.tsTech.practice.IMS_v2.common.mapper.baseMapper.GenericMapper;
 import com.tsTech.practice.IMS_v2.setup.dto.request.IcdRequest;
 import com.tsTech.practice.IMS_v2.setup.dto.response.IcdResponse;
+import com.tsTech.practice.IMS_v2.setup.dto.response.IcdSearchResponse;
 import com.tsTech.practice.IMS_v2.setup.entities.ICD;
 import org.mapstruct.*;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -18,6 +20,7 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : Change || Aug 17, 2026 || TaukirS (ER 1014 - icd entity setup coding)
+// v1.2 || type : Change || Aug 21, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 /////////////////////////////////////////////
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = BaseRecordMapper.class)
@@ -38,6 +41,9 @@ public interface IcdMapper extends GenericMapper<ICD, IcdRequest> {
     @Mapping(target = "code", source = "code", qualifiedByName = "toUpperCaseAndTrim")
     void updateEntityFromRequest(IcdRequest request, @MappingTarget ICD icd);
 
+    //Aug 21, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    List<IcdSearchResponse> toSearchResponseList(List<ICD> icdList);
+
     // =========================================================================
     //  Internal Helper Methods
     // =========================================================================
@@ -48,5 +54,4 @@ public interface IcdMapper extends GenericMapper<ICD, IcdRequest> {
                 value.trim().toUpperCase() :
                 null;
     }
-
 }

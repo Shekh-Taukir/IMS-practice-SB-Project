@@ -1,4 +1,4 @@
-package com.tsTech.practice.IMS_v2.visitNote.dto.request;
+package com.tsTech.practice.IMS_v2.visitNote.core.dto.request;
 
 import com.tsTech.practice.IMS_v2.common.annotations.EntityStringValidation;
 import jakarta.validation.constraints.Max;

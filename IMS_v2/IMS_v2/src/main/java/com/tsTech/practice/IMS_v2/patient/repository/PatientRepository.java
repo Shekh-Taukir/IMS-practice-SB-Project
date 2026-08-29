@@ -26,6 +26,7 @@ import java.util.Optional;
 // v1.3 || type : Change || Jul 30, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
 // v1.4 || type : Change || Aug 16, 2026 || TaukirS (ER 1013 - case master coding)
 // v1.5 || type : Change || Aug 21, 2026 || TaukirS (ER 1015 - visitnote entity coding)
+// v1.6 || type : Change || Aug 23, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 ////////////////////////////////////////////////
 
 @Repository
@@ -82,13 +83,25 @@ public interface PatientRepository extends JpaRepository<Patient, Long> {
         return patient;
     }*/
 
-    default <T> T unwrapOrThrow(Optional<T> result, Long patientId){
-        return result.orElseThrow(()-> new ResourceNotFoundException("Patient", patientId));
+    default void patientExistsById(Long patientId){
+        //Aug 23, 2026 TaukirS (ER 1016 - diagnosis entity coding) - made patient not found a common logic to throw ResourceNotFoundException for patient
+        if(!existsById(patientId))
+            throw patientNotFound(patientId);
     }
 
-    default void patientExistsById(Long patientId){
-        if(!existsById(patientId))
-            throw new ResourceNotFoundException("Patient", patientId);
+    // =========================================================================
+    //  Internal Helper Methods
+    // =========================================================================
+
+    private static <T> T unwrapOrThrow(Optional<T> result, Long patientId){
+        //Aug 23, 2026 TaukirS (ER 1016 - diagnosis entity coding) - made patient not found a common logic to throw ResourceNotFoundException for patient
+        return result.orElseThrow(()-> patientNotFound(patientId));
     }
     //End Aug 16, 2026 TaukirS (ER 1013 - case master coding)
+
+    //Start Aug 23, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    private static ResourceNotFoundException patientNotFound(Long patientId){
+        return new ResourceNotFoundException("Patient", patientId);
+    }
+    //End Aug 23, 2026 TaukirS (ER 1016 - diagnosis entity coding)
 }
