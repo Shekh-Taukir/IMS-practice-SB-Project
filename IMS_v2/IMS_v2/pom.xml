@@ -118,9 +118,14 @@
 		<dependency>
 			<groupId>org.openapitools</groupId>
 			<artifactId>jackson-databind-nullable</artifactId>
-			<version>0.2.6</version>
+			<version>0.2.10</version>
 		</dependency>
 <!--		//End Aug 23, 2026 TaukirS (ER 1016 - diagnosis entity coding)-->
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jackson2</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

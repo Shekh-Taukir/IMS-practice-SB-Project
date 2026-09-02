@@ -38,7 +38,7 @@ public class DiagnosisIcdMap extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diagnosis_id", nullable = false)
-//    @OnDelete(action = OnDeleteAction.CASCADE) //TODO: Need to add a migration, to add constraint for on delete cascade for icd mapping table for diagnosis id.
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Diagnosis diagnosis;
 
     @ManyToOne(fetch = FetchType.LAZY)

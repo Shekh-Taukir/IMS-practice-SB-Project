@@ -1,6 +1,7 @@
 package com.tsTech.practice.IMS_v2.visitNote.diagnosis.dto.request;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -26,7 +27,7 @@ public record DiagnosisCreateRequest(
         String note,
 
         @Valid
-        @NotNull(message = "Icd item list cannot be null")
+        @NotEmpty(message = "Icd item list cannot be null")
         @Size(max = 8, message = "Icd list cannot contain more than 8 icds")
         List<DiagnosisIcdMapRequest> icdItemList
 ) {

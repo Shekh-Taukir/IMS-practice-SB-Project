@@ -20,9 +20,9 @@ import lombok.Getter;
 public class ResourceNotFoundException extends RuntimeException{
 
     private final String resource;
-    private final Long identifier;
+    private final Object identifier;
 
-    public ResourceNotFoundException(String resource, Long identifier) {
+    public ResourceNotFoundException(String resource, Object identifier) {
         //Aug 21, 2026 TaukirS (ER 1015 - visitnote entity coding) , updated the message
         super(resource+" not found for id : "+identifier);
         this.resource = resource;

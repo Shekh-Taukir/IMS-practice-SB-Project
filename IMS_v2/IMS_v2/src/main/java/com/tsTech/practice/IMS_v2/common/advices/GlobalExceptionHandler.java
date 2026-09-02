@@ -3,8 +3,8 @@ package com.tsTech.practice.IMS_v2.common.advices;
 import com.tsTech.practice.IMS_v2.common.exception.BusinessValidationException;
 import com.tsTech.practice.IMS_v2.common.exception.DuplicateResourceException;
 import com.tsTech.practice.IMS_v2.common.exception.ResourceNotFoundException;
-import jakarta.persistence.EntityExistsException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -32,6 +32,7 @@ import java.util.*;
 // v1.3 || type : Change || Jul 27, 2026 || TaukirS (ER 1009 - api_error changes for record, func and exception changes)
 // v1.4 || type : Change || Jul 28, 2026 || TaukirS (ER 1010 - office api setup changes)
 // v1.5 || type : Change || Jul 31, 2026 || TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+// v1.6 || type : Change || Aug 31, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
 ////////////////////////////////////////////////
 
 //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
@@ -116,7 +117,7 @@ public class GlobalExceptionHandler {
     }
 
     //NOTE: following exception occurs when for an enum field, user provides empty string, and its cannot be matched with none of the enum values.
-    @ExceptionHandler(HttpMessageNotReadableException.class)
+//    @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<?>> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, HttpServletRequest servletRequest){
         //Jul 23, 2026 TaukirS (ER 1007 - logging and dto to record changes)
         log.error("API => {}:{} | Http Message Not Readable Exception due to invalid user input for invalid json data in api | exception : ",servletRequest.getMethod(),servletRequest.getRequestURL(),exception);
@@ -157,6 +158,25 @@ public class GlobalExceptionHandler {
         return getApiResponseObj(HttpStatus.UNPROCESSABLE_CONTENT, exception.getMessage(), exception.getErrorCode());
     }
     //End Jul 31, 2026 TaukirS (ER 1011 - flyway integration & add office and provider in patient)
+
+
+    //Start Aug 31, 2026 TaukirS (ER 1016 - diagnosis entity coding)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<?>> handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest servletRequest){
+        log.error("API => {}:{} | Constraint Violation Exception | Patch Api | exception : ", servletRequest.getMethod(), servletRequest.getRequestURL(), exception);
+
+        List<ApiError.FieldError> subErrors = exception.getConstraintViolations()
+                .stream()
+                .map(violation-> new ApiError.FieldError(
+                        violation.getPropertyPath().toString(),
+                        violation.getMessage()
+                ))
+                .toList();
+
+        return getApiResponseObj(HttpStatus.BAD_REQUEST, "Invalid user input in Patch API", "INVALID_USER_INPUT", subErrors);
+
+    }
+    //End Aug 31, 2026 TaukirS (ER 1016 - diagnosis entity coding)
 
     // =========================================================================
     //  Internal Helper Methods
