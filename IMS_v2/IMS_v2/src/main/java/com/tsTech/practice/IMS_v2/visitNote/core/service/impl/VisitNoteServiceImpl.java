@@ -5,8 +5,8 @@ import com.tsTech.practice.IMS_v2.office.entities.Provider;
 import com.tsTech.practice.IMS_v2.office.repository.ProviderRepository;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
 import com.tsTech.practice.IMS_v2.patient.repository.PatientRepository;
-import com.tsTech.practice.IMS_v2.setup.entities.VisitType;
-import com.tsTech.practice.IMS_v2.setup.repository.VisitTypeRepository;
+import com.tsTech.practice.IMS_v2.setup.visitType.entities.VisitType;
+import com.tsTech.practice.IMS_v2.setup.visitType.repository.VisitTypeRepository;
 import com.tsTech.practice.IMS_v2.visitNote.core.dto.request.VisitNoteRequest;
 import com.tsTech.practice.IMS_v2.visitNote.core.dto.response.VisitNoteResponse;
 import com.tsTech.practice.IMS_v2.visitNote.core.entities.VisitNote;
@@ -23,7 +23,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-/////////////////////////////////////////////
+/// //////////////////////////////////////////
 //
 // Name: VisitNote Service Impl
 //
@@ -32,6 +32,7 @@ import java.util.Map;
 // Version history:
 //
 // v1.1 || type : Change || Aug 20, 2026 || TaukirS (ER 1015 - visitnote entity coding)
+
 /////////////////////////////////////////////
 
 @Service
@@ -93,7 +94,9 @@ public class VisitNoteServiceImpl implements VisitNoteService {
     public VisitNoteResponse updateVisitById(Long patientId, Long pnId, VisitNoteRequest request) {
         log.debug("Entering updateVisitById() | patientId: {} | pnId: {}", patientId, pnId);
 
-        if(!(request.patientId().equals(patientId)))
+        if (!(request
+                .patientId()
+                .equals(patientId)))
             throw new BusinessValidationException("Patient Id in url doesn't matches with request body's patient Id", "PATIENT_ID_MISMATCH");
         VisitNote visitNote = visitNoteRepository.getEntityById(patientId, pnId);
 
@@ -121,8 +124,8 @@ public class VisitNoteServiceImpl implements VisitNoteService {
         log.debug("Entering patchUpdateVisitById() | patientId: {} | pnId: {}", patientId, pnId, patchUpdate);
         VisitNote visitNote = visitNoteRepository.getEntityById(patientId, pnId);
 
-        patchUpdate.forEach((key, value)->{
-            switch (key){
+        patchUpdate.forEach((key, value) -> {
+            switch (key) {
                 case "providerId":
                     updateProviderInVisit(Long.valueOf(value.toString()), visitNote);
                     break;
@@ -130,7 +133,7 @@ public class VisitNoteServiceImpl implements VisitNoteService {
                 case "visitTypeId":
                     updateVisitTypeInVisit(Long.valueOf(value.toString()), visitNote);
                     break;
-                    
+
                 default:
                     Field field = ReflectionUtils.getRequiredField(VisitNote.class, key);
                     field.setAccessible(true);
@@ -147,28 +150,30 @@ public class VisitNoteServiceImpl implements VisitNoteService {
     //  Internal Helper Methods
     // =========================================================================
 
-    void logResult(String action, String methodName, Long patientId, Long pnId, Object inputData, Object resultData){
-        String logString = "VisitNote: "+action+" | "+methodName+" | patientId: "+patientId;
+    void logResult(String action, String methodName, Long patientId, Long pnId, Object inputData, Object resultData) {
+        String logString = "VisitNote: " + action + " | " + methodName + " | patientId: " + patientId;
 
-        if(pnId!=null)
-            logString+=" | pnId: "+pnId;
+        if (pnId != null)
+            logString += " | pnId: " + pnId;
 
         log.debug(logString);
-        if(log.isTraceEnabled()){
+        if (log.isTraceEnabled()) {
 
-            if(inputData!=null)
-                logString+=" | inputData: "+inputData;
+            if (inputData != null)
+                logString += " | inputData: " + inputData;
 
-            if(resultData!=null)
-                logString+=" | resultData: "+resultData;
+            if (resultData != null)
+                logString += " | resultData: " + resultData;
 
             log.trace(logString);
         }
     }
 
-    private void updateProviderInVisit(Long providerId, VisitNote visitNote){
-        if(providerId!=null && !(visitNote.getProvider().getTranId().equals(providerId)))
-        {
+    private void updateProviderInVisit(Long providerId, VisitNote visitNote) {
+        if (providerId != null && !(visitNote
+                .getProvider()
+                .getTranId()
+                .equals(providerId))) {
             log.debug("Updating new provider & office in visit note");
             Provider provider = providerRepository.getEntityById(providerId);
             visitNote.setProvider(provider);
@@ -176,8 +181,11 @@ public class VisitNoteServiceImpl implements VisitNoteService {
         }
     }
 
-    private void updateVisitTypeInVisit(Long visitTypeId, VisitNote visitNote){
-        if(visitTypeId!=null && !(visitNote.getVisitType().getTranId().equals(visitTypeId))){
+    private void updateVisitTypeInVisit(Long visitTypeId, VisitNote visitNote) {
+        if (visitTypeId != null && !(visitNote
+                .getVisitType()
+                .getTranId()
+                .equals(visitTypeId))) {
             log.debug("Updating new visitType in visit note");
             VisitType visitType = visitTypeRepository.getEntityById(visitTypeId);
             visitNote.setVisitType(visitType);
