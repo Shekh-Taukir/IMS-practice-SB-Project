@@ -4,7 +4,7 @@ import com.tsTech.practice.IMS_v2.common.entity.base.BaseEntity;
 import com.tsTech.practice.IMS_v2.office.entities.Office;
 import com.tsTech.practice.IMS_v2.office.entities.Provider;
 import com.tsTech.practice.IMS_v2.patient.entities.Patient;
-import com.tsTech.practice.IMS_v2.setup.entities.VisitType;
+import com.tsTech.practice.IMS_v2.setup.visitType.entities.VisitType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-/////////////////////////////////////////////
+/// //////////////////////////////////////////
 //
 // Name: Visit Note Entity
 //
@@ -22,6 +22,7 @@ import java.time.LocalDate;
 // Version history:
 //
 // v1.1 || type : Change || Aug 20, 2026 || TaukirS (ER 1015 - visit note entity coding)
+
 /////////////////////////////////////////////
 
 @Entity
@@ -33,7 +34,7 @@ import java.time.LocalDate;
         name = "visit_note",
         indexes = {
                 @Index(name = "idx_visit_note_patient_id", columnList = "patient_id"),
-                @Index(name="idx_visit_note_office_id_provider_id", columnList = "office_id, provider_id")
+                @Index(name = "idx_visit_note_office_id_provider_id", columnList = "office_id, provider_id")
         }
 )
 public class VisitNote extends BaseEntity {

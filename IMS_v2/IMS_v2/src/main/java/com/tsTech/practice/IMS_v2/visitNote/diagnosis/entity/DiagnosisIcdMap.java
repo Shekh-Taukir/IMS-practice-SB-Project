@@ -1,14 +1,13 @@
 package com.tsTech.practice.IMS_v2.visitNote.diagnosis.entity;
 
 import com.tsTech.practice.IMS_v2.common.entity.base.BaseEntity;
-import com.tsTech.practice.IMS_v2.setup.entities.ICD;
+import com.tsTech.practice.IMS_v2.setup.icd.entities.ICD;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DialectOverride;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-/////////////////////////////////////////////
+/// //////////////////////////////////////////
 //
 // Name: Diagnosis ICD Mapping Entity
 //
@@ -17,7 +16,8 @@ import org.hibernate.annotations.OnDeleteAction;
 // Version history:
 //
 // v1.1 || type : Change || Aug 21, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
-/////////////////////////////////////////////
+
+/// //////////////////////////////////////////
 
 @Getter
 @Setter
@@ -48,7 +48,7 @@ public class DiagnosisIcdMap extends BaseEntity {
     @Column(nullable = false, columnDefinition = "BIGINT CHECK (seq BETWEEN 1 AND 8)")
     private Long seq;
 
-    public String toString(){
-        return "DiagnosisIcdMap{diagnosis : "+diagnosis.getTranId()+" | icd: "+icd.getTranId()+" | seq = "+seq;
+    public String toString() {
+        return "DiagnosisIcdMap{diagnosis : " + diagnosis.getTranId() + " | icd: " + icd.getTranId() + " | seq = " + seq;
     }
 }
