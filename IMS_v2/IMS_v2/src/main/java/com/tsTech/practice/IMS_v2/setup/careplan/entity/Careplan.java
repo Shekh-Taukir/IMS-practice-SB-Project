@@ -9,6 +9,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/// //////////////////////////////////////////
+//
+// Name: Careplan Controller
+//
+// Description:
+//
+// Version history:
+//
+// v1.1 || type : Change || Sep 04, 2026 || TaukirS (ER 1017 - careplan mst entity coding)
+
+/// //////////////////////////////////////////
+
 @Getter
 @Setter
 @Entity
