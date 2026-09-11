@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public record VnLabOrderPatchRequest(
         JsonNullable<Long> labOrderId,
         JsonNullable<LocalDateTime> takenAt,
-        JsonNullable<String> note
+        JsonNullable<String> note,
+        JsonNullable<Boolean> isActive
 ) {
 }

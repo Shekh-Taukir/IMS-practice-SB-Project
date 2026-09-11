@@ -7,12 +7,14 @@ import java.time.LocalDateTime;
 
 public record VnLabOrderResponse(
         Long pnId,
-        Long patientId,
-        Long officeId,
-        Long providerId,
         Long labOrderId,
         LocalDateTime takenAt,
         String note,
         @JsonUnwrapped BaseRecord baseRecord
-        ) {
+
+        //TODO: Need to add this in future
+//        Long patientId,
+//        Long officeId,
+//        Long providerId,
+) {
 }

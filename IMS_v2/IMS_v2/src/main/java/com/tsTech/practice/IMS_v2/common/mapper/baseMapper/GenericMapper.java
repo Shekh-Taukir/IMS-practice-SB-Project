@@ -7,6 +7,7 @@ import org.mapstruct.Named;
 import org.openapitools.jackson.nullable.JsonNullable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /// /////////////////////////////////////////////
 //
@@ -19,6 +20,8 @@ import java.time.LocalDate;
 // v1.1 || type : Change || Jul 01, 2026 || TaukirS (ER 1006 - mapStruct setup changes)
 // v1.2 || type : Change || Jul 25, 2026 || TaukirS (ER 1007 - logging and dto to record changes)
 // v1.3 || type : Change || Sep 04, 2026 || TaukirS (ER 1017 - careplan mst entity coding)
+// v1.4 || type : Change || Sep 11, 2026 || TaukirS (ER 1020 - vn lab order entity coding)
+
 /// /////////////////////////////////////////////
 
 public interface GenericMapper<E, R> {
@@ -55,4 +58,11 @@ public interface GenericMapper<E, R> {
         return value.orElse(null);
     }
     //End Sep 04, 2026 TaukirS (ER 1017 - careplan mst entity coding)
+
+    //Start Sep 11, 2026 TaukirS (ER 1020 - vn lab order entity coding)
+    default LocalDateTime unwrapLocalDateTime(JsonNullable<LocalDateTime> value) {
+        return value.orElse(null);
+    }
+    //End Sep 11, 2026 TaukirS (ER 1020 - vn lab order entity coding)
+
 }
