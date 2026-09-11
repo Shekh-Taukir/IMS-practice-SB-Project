@@ -10,5 +10,6 @@
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/Diagnosis/V9__add_new_deferable_unique_constraint_for_diagnosis_icd_mapping.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/LabOrder/V13__adding_lab_order_hdr.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnLabOrder/V14__adding_vn_lab_order.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnLabOrder/V16__adding_vn_lab_order_icd_map.sql" dialect="GenericSQL" />
   </component>
 </project>
