@@ -6,6 +6,7 @@ import com.tsTech.practice.IMS_v2.setup.icd.entities.ICD;
 import com.tsTech.practice.IMS_v2.setup.icd.repository.IcdRepository;
 import com.tsTech.practice.IMS_v2.setup.icd.service.IcdComUtils;
 import com.tsTech.practice.IMS_v2.visitNote.diagnosis.dto.request.DiagnosisIcdMapRequest;
+import com.tsTech.practice.IMS_v2.visitNote.diagnosis.service.DiagnosisIcdMapUtils;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.projection.VnCareplanIcdMapProjection;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.request.VnCareplanIcdMapRequest;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.request.VnCareplanPatchRequest;
@@ -38,7 +39,8 @@ import java.util.stream.Collectors;
 // Version history:
 //
 // v1.1 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
-// v1.2 || type : Change || Sep 09, 2026 || TaukirHp (ER 1020 - vn careplan icd map entity coding)
+// v1.2 || type : Change || Sep 09, 2026 || TaukirHp (ER 1021 - vn careplan icd map entity coding)
+
 /// //////////////////////////////////////////
 
 @Slf4j
@@ -52,6 +54,8 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
     private final IcdRepository icdRepository;
 
     private final VnCareplanIcdMapMapper mapper;
+    //Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+    private final DiagnosisIcdMapUtils diagnosisIcdMapUtils;
 
     @Override
     @Transactional
@@ -64,11 +68,15 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         if (repository.existsByVnCareplan_TranId(vnCareplanId))
             throw new DuplicateResourceException("DUPLICATE_VN_CAREPLAN_ICD_MAP", "Icd Mapping already exists for vnCareplanId: " + vnCareplanId);
 
-        //Sep 09, 2026 TaukirHp (ER 1020 - vn lab order entity coding)
+        //Sep 09, 2026 TaukirHp (ER 1021 - vn lab order entity coding)
         //created a function as this map creation will get used in update api as well
         Map<Long, Long> requestIcdMap = getRequstIcdMap(request);
 
         Map<Long, ICD> newIcdMap = IcdComUtils.getNewIcdsFromReq(requestIcdMap.keySet(), icdRepository);
+
+        //Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+        //this adds up new icds from request list into DiagnosisIcdMap which falls under following pnId
+        diagnosisIcdMapUtils.updateDiagnosisForNewIcds(requestIcdMap.keySet(), vnCareplan.getVisitNote().getTranId());
 
         List<VnCareplanIcdMap> newCareplanIcdMap = newIcdMap
                 .entrySet()
@@ -88,8 +96,7 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         logResult("VnCareplanIcdMap Created", "createVnCareplanIcdMap", vnCareplanId, request, response);
         return response;
     }
-
-
+    
     @Override
     public List<VnCareplanIcdMapResponse> getVnCareplanIcdMapList(Long vnCareplanId) {
         //Start Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
@@ -116,14 +123,14 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
                 .findByVnCareplan_TranId(vnCareplanId)
                 .stream()
                 .collect(Collectors.toMap(
-                        x->x.getIcd().getTranId(),
+                        x -> x.getIcd().getTranId(),
                         Function.identity()));
 
         // get the list of icds which needs to be deleted : (existing - request) icd list
         Set<Long> toBeDeletedIcdSet = icdMaps
                 .keySet()
                 .stream()
-                .filter(x->!requestIcdMap.containsKey(x))
+                .filter(x -> !requestIcdMap.containsKey(x))
                 .collect(Collectors.toSet());
 
         //after getting list, remove it from icdMap, and collect a list so that it can be directly passed to deleteAll()
@@ -133,10 +140,10 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
                 .toList();
 
         requestIcdMap
-                .forEach((newIcdId, newSeq)->{
-                    if((icdMaps.containsKey(newIcdId)) &&
-                            !icdMaps.get(newIcdId).getSeq().equals(newSeq)){
-                            icdMaps.get(newIcdId).setSeq(newSeq);
+                .forEach((newIcdId, newSeq) -> {
+                    if ((icdMaps.containsKey(newIcdId)) &&
+                            !icdMaps.get(newIcdId).getSeq().equals(newSeq)) {
+                        icdMaps.get(newIcdId).setSeq(newSeq);
                     }
                 });
 
@@ -144,13 +151,17 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         Set<Long> newIcdSet = requestIcdMap
                 .keySet()
                 .stream()
-                .filter(x->!icdMaps.containsKey(x))
+                .filter(x -> !icdMaps.containsKey(x))
                 .collect(Collectors.toSet());
 
         Map<Long, ICD> newIcdMap = IcdComUtils.getNewIcdsFromReq(newIcdSet, icdRepository);
 
+        //Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+        //this adds up new icds from request list into DiagnosisIcdMap which falls under following pnId
+        diagnosisIcdMapUtils.updateDiagnosisForNewIcds(requestIcdMap.keySet(), vnCareplan.getVisitNote().getTranId());
+
         //loops through the new icd's and add the VnCareplanIcd to list.
-        newIcdMap.forEach((key, value)->{
+        newIcdMap.forEach((key, value) -> {
             icdMaps.put(key, VnCareplanIcdMap
                     .builder()
                     .seq(requestIcdMap.get(key))
@@ -204,7 +215,7 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
 
     }
 
-    //Start Sep 09, 2026 TaukirHp (ER 1020 - vn careplan icd map entity coding)
+    //Start Sep 09, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
     private Map<Long, Long> getRequstIcdMap(VnCareplanIcdMapRequest request) {
         return request
                 .icdItemList()
@@ -213,6 +224,6 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
                         DiagnosisIcdMapRequest::icdId,
                         DiagnosisIcdMapRequest::seq));
     }
-    //End Sep 09, 2026 TaukirHp (ER 1020 - vn careplan icd map entity coding)
+    //End Sep 09, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
 
 }

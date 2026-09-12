@@ -70,9 +70,11 @@ public class DiagnosisServiceImpl implements DiagnosisService {
     public DiagnosisResponse createDiagnosis(Long pnId, DiagnosisCreateRequest request) {
         log.debug("Entering createVisit() | pnId: {}", pnId);
 
+        //validate the user entered icdList
         checkDuplicateSeqAndIcdInRequest(request.icdItemList());
 
         VisitNote visitNote = visitNoteRepository.getVisitNoteEntityById(pnId);
+        //NOTE: to maintain that single diagnosis should be there per visit
         diagnosisRepository.checkDiagnosisExistsByPnId(pnId);
 
         Diagnosis diagnosis = diagnosisMapper.fromRequestToEntity(request);
@@ -341,6 +343,7 @@ public class DiagnosisServiceImpl implements DiagnosisService {
             throw new DuplicateResourceException("DUPLICATE_ICD_ID", "Duplicate Icd ids provided in input");
     }
 
+    //TODO: Need to use IcdComUtils.getNewIcdsFromReq, instead of using following function, as that function is made to use it commonly
     private Map<Long, ICD> getNewIcdsFromReq(Set<Long> newIcdIdSet) {
 
         Map<Long, ICD> icdIdMap = icdRepository
