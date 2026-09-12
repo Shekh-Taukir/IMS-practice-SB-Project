@@ -9,6 +9,9 @@
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/Diagnosis/V8__adding_diagnosis_mst_and_diagnosis_icd_mapping.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/Diagnosis/V9__add_new_deferable_unique_constraint_for_diagnosis_icd_mapping.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/LabOrder/V13__adding_lab_order_hdr.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnCareplan/V12__adding_vn_careplan_mst.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnCareplan/V15.1__add_new_deferrable_unique_key_constraint_for_vn_careplan_icd_map.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnCareplan/V15__adding_vn_careplan_icd_map.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnLabOrder/V14__adding_vn_lab_order.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/IMS_v2/IMS_v2/src/main/resources/db/migration/VisitNote/VnLabOrder/V16__adding_vn_lab_order_icd_map.sql" dialect="GenericSQL" />
   </component>
