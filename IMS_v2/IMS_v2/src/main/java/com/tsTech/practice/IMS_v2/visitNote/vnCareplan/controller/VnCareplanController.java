@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/visit/{pn_Id}/vn-careplan")
-public class VnCareplanController {
+public class VnCareplanController {  
 
     private final VnCareplanService vnCareplanService;
     private static final String ID_URL = "/{id}";
