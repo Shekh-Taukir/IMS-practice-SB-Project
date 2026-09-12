@@ -18,7 +18,8 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : New Func || Sep 08, 2026 || TaukirHp (ER 1020 - vn lab order entity coding)
-// v1.1 || type : Change || Sep 11, 2026 || TaukirS (ER 1020 - vn lab order entity coding)
+// v1.2 || type : Change || Sep 11, 2026 || TaukirS (ER 1020 - vn lab order entity coding)
+// v1.3 || type : Change || Sep 12, 2026 || TaukirS (ER 1022 - vn lab order icd map entity coding)
 
 /// //////////////////////////////////////////
 
@@ -39,12 +40,19 @@ public interface VnLabOrderRepository extends JpaRepository<VnLabOrder, Long> {
     }
 
     default VnLabOrder getEntityById(Long pnId, Long vnLabOrderId) {
-        VnLabOrder vnLabOrder = findById(vnLabOrderId)
-                .orElseThrow(() -> new ResourceNotFoundException("VnLabOrder", vnLabOrderId));
+        //Sep 12, 2026 TaukirS (ER 1022 - vn lab order icd map entity coding)
+        VnLabOrder vnLabOrder = getEntityById(vnLabOrderId);
 
         if (!vnLabOrder.getVisitNote().getTranId().equals(pnId))
             throw new BusinessValidationException("Vn LabOrder of id: " + vnLabOrderId + " doesn't fall under Visit Note of id: " + pnId, "VISIT_NOTE_VN_LABORDER_MISMATCH");
 
         return vnLabOrder;
     }
+
+    //Start Sep 12, 2026 TaukirS (ER 1022 - vn lab order icd map entity coding)
+    default VnLabOrder getEntityById(Long vnLabOrderId) {
+        return findById(vnLabOrderId)
+                .orElseThrow(() -> new ResourceNotFoundException("VnLabOrder", vnLabOrderId));
+    }
+    //End Sep 12, 2026 TaukirS (ER 1022 - vn lab order icd map entity coding)
 }

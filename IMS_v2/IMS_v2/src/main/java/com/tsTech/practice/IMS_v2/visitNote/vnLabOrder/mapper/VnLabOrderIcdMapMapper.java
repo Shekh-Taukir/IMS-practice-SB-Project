@@ -39,5 +39,5 @@ public interface VnLabOrderIcdMapMapper extends GenericMapper<VnLabOrder, VnLabO
     @Mapping(target = "vnLabOrderId", source = "vnLabOrder.tranId")
     VnLabOrderIcdMapResponse toResponse(VnLabOrderIcdMap icdMap);
 
-    List<VnLabOrderIcdMapResponse> fromProjectionToResponseList(List<VnLabOrderIcdMapProjection> projection);
+    List<VnLabOrderIcdMapResponse> fromProjectionToResponse(List<VnLabOrderIcdMapProjection> projection);
 }

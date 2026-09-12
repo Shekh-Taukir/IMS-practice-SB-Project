@@ -31,7 +31,7 @@ import org.hibernate.annotations.OnDeleteAction;
                 @Index(name = "idx_vn_lab_order_icd_map_vn_lab_order_id_icd_id", columnList = "vn_lab_order_id, icd_id")
         },
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_vn_lab_order_icd_map_vn_lab_order_id_seq", columnNames = {"vn_lab_order_id", "seq"})
+                @UniqueConstraint(name = "uk_vn_lab_order_icd_map_vn_lab_order_id_seq_deferrable", columnNames = {"vn_lab_order_id", "seq"})
         }
 )
 public class VnLabOrderIcdMap extends BaseEntity {

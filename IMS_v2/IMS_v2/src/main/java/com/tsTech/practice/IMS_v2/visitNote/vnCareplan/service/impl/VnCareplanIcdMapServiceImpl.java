@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 //
 // v1.1 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
 // v1.2 || type : Change || Sep 09, 2026 || TaukirHp (ER 1021 - vn careplan icd map entity coding)
+// v1.3 || type : Change || Sep 12, 2026 || TaukirS (ER 1022 - vn lab order icd map entity coding)
 
 /// //////////////////////////////////////////
 
@@ -70,7 +71,8 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
 
         //Sep 09, 2026 TaukirHp (ER 1021 - vn lab order entity coding)
         //created a function as this map creation will get used in update api as well
-        Map<Long, Long> requestIcdMap = getRequstIcdMap(request);
+        //Sep 12, 2026 TaukirS (ER 1022 - vn lab order icd map entity coding) - move the class function to DiangosisIcdMapRequest dto
+        Map<Long, Long> requestIcdMap = DiagnosisIcdMapRequest.getRequstIcdMap(request.icdItemList());
 
         Map<Long, ICD> newIcdMap = IcdComUtils.getNewIcdsFromReq(requestIcdMap.keySet(), icdRepository);
 
@@ -96,7 +98,7 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         logResult("VnCareplanIcdMap Created", "createVnCareplanIcdMap", vnCareplanId, request, response);
         return response;
     }
-    
+
     @Override
     public List<VnCareplanIcdMapResponse> getVnCareplanIcdMapList(Long vnCareplanId) {
         //Start Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
@@ -117,7 +119,8 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         log.debug("Entering updateVnCareplanIcdMap | vnCareplanId: {}", vnCareplanId);
         VnCareplan vnCareplan = vnCareplanRepository.getEntityById(vnCareplanId);
         IcdComUtils.checkDuplicateSeqAndIcdInRequest(request.icdItemList());
-        Map<Long, Long> requestIcdMap = getRequstIcdMap(request);
+        //Sep 12, 2026 TaukirS (ER 1022 - vn lab order icd map entity coding) - move the class function to DiangosisIcdMapRequest dto
+        Map<Long, Long> requestIcdMap = DiagnosisIcdMapRequest.getRequstIcdMap(request.icdItemList());
 
         Map<Long, VnCareplanIcdMap> icdMaps = repository
                 .findByVnCareplan_TranId(vnCareplanId)
@@ -214,16 +217,4 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         }
 
     }
-
-    //Start Sep 09, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
-    private Map<Long, Long> getRequstIcdMap(VnCareplanIcdMapRequest request) {
-        return request
-                .icdItemList()
-                .stream()
-                .collect(Collectors.toMap(
-                        DiagnosisIcdMapRequest::icdId,
-                        DiagnosisIcdMapRequest::seq));
-    }
-    //End Sep 09, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
-
 }
