@@ -6,9 +6,11 @@ import com.tsTech.practice.IMS_v2.setup.icd.entities.ICD;
 import com.tsTech.practice.IMS_v2.setup.icd.repository.IcdRepository;
 import com.tsTech.practice.IMS_v2.setup.icd.service.IcdComUtils;
 import com.tsTech.practice.IMS_v2.visitNote.diagnosis.dto.request.DiagnosisIcdMapRequest;
+import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.projection.VnCareplanIcdMapProjection;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.request.VnCareplanIcdMapRequest;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.request.VnCareplanPatchRequest;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.response.VnCareplanIcdMapResponse;
+import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.dto.response.VnCareplanResponse;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.entity.VnCareplan;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.entity.VnCareplanIcdMap;
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.mapper.VnCareplanIcdMapMapper;
@@ -17,11 +19,14 @@ import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.repository.VnCareplanRepo
 import com.tsTech.practice.IMS_v2.visitNote.vnCareplan.service.VnCareplanIcdMapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /// //////////////////////////////////////////
@@ -33,7 +38,7 @@ import java.util.stream.Collectors;
 // Version history:
 //
 // v1.1 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
-
+// v1.2 || type : Change || Sep 09, 2026 || TaukirHp (ER 1020 - vn careplan icd map entity coding)
 /// //////////////////////////////////////////
 
 @Slf4j
@@ -59,12 +64,9 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         if (repository.existsByVnCareplan_TranId(vnCareplanId))
             throw new DuplicateResourceException("DUPLICATE_VN_CAREPLAN_ICD_MAP", "Icd Mapping already exists for vnCareplanId: " + vnCareplanId);
 
-        Map<Long, Long> requestIcdMap = request
-                .icdItemList()
-                .stream()
-                .collect(Collectors.toMap(
-                        DiagnosisIcdMapRequest::icdId,
-                        DiagnosisIcdMapRequest::seq));
+        //Sep 09, 2026 TaukirHp (ER 1020 - vn lab order entity coding)
+        //created a function as this map creation will get used in update api as well
+        Map<Long, Long> requestIcdMap = getRequstIcdMap(request);
 
         Map<Long, ICD> newIcdMap = IcdComUtils.getNewIcdsFromReq(requestIcdMap.keySet(), icdRepository);
 
@@ -87,16 +89,85 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
         return response;
     }
 
+
     @Override
-    @Transactional
     public List<VnCareplanIcdMapResponse> getVnCareplanIcdMapList(Long vnCareplanId) {
-        return List.of();
+        //Start Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+        log.debug("Entering getVnCareplanIcdMapList | vnCareplanId: {}", vnCareplanId);
+
+        List<VnCareplanIcdMapProjection> icdMapProjections = repository.getVnCareplanIcdProjection(vnCareplanId);
+
+        List<VnCareplanIcdMapResponse> response = mapper.fromProjectionToResponse(icdMapProjections);
+        logResult("VnCareplanIcdMap List Retrieved", "getVnCareplanIcdMapList", vnCareplanId, null, response);
+        return response;
+        //End Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
     }
 
     @Override
     @Transactional
     public List<VnCareplanIcdMapResponse> updateVnCareplanIcdMapById(Long vnCareplanId, VnCareplanIcdMapRequest request) {
-        return List.of();
+        //Start Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+        log.debug("Entering updateVnCareplanIcdMap | vnCareplanId: {}", vnCareplanId);
+        VnCareplan vnCareplan = vnCareplanRepository.getEntityById(vnCareplanId);
+        IcdComUtils.checkDuplicateSeqAndIcdInRequest(request.icdItemList());
+        Map<Long, Long> requestIcdMap = getRequstIcdMap(request);
+
+        Map<Long, VnCareplanIcdMap> icdMaps = repository
+                .findByVnCareplan_TranId(vnCareplanId)
+                .stream()
+                .collect(Collectors.toMap(
+                        x->x.getIcd().getTranId(),
+                        Function.identity()));
+
+        // get the list of icds which needs to be deleted : (existing - request) icd list
+        Set<Long> toBeDeletedIcdSet = icdMaps
+                .keySet()
+                .stream()
+                .filter(x->!requestIcdMap.containsKey(x))
+                .collect(Collectors.toSet());
+
+        //after getting list, remove it from icdMap, and collect a list so that it can be directly passed to deleteAll()
+        List<VnCareplanIcdMap> toBeDeletedIcdList = toBeDeletedIcdSet
+                .stream()
+                .map(icdMaps::remove)
+                .toList();
+
+        requestIcdMap
+                .forEach((newIcdId, newSeq)->{
+                    if((icdMaps.containsKey(newIcdId)) &&
+                            !icdMaps.get(newIcdId).getSeq().equals(newSeq)){
+                            icdMaps.get(newIcdId).setSeq(newSeq);
+                    }
+                });
+
+        //get list of icds which are new in request, and doesn't exists in current list
+        Set<Long> newIcdSet = requestIcdMap
+                .keySet()
+                .stream()
+                .filter(x->!icdMaps.containsKey(x))
+                .collect(Collectors.toSet());
+
+        Map<Long, ICD> newIcdMap = IcdComUtils.getNewIcdsFromReq(newIcdSet, icdRepository);
+
+        //loops through the new icd's and add the VnCareplanIcd to list.
+        newIcdMap.forEach((key, value)->{
+            icdMaps.put(key, VnCareplanIcdMap
+                    .builder()
+                    .seq(requestIcdMap.get(key))
+                    .icd(value)
+                    .vnCareplan(vnCareplan)
+                    .build()
+            );
+        });
+
+        repository.deleteAll(toBeDeletedIcdList);
+        List<VnCareplanIcdMapResponse> response = mapper.toResponseList(
+                repository.saveAll(icdMaps.values())
+        );
+
+        logResult("Update VnCareplanICdMaps ", "updateVNCareplanICdMapById", vnCareplanId, request, response);
+        return response;
+        //End Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
     }
 
     @Override
@@ -116,7 +187,6 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
     //  Internal Helper Methods
     // =========================================================================
 
-
     void logResult(String action, String methodName, Long vnCareplanId, Object input, Object result) {
         String logString = "Careplan Mst: " + action + " | " + methodName + " | vnCarePlanId: " + vnCareplanId;
 
@@ -134,5 +204,15 @@ public class VnCareplanIcdMapServiceImpl implements VnCareplanIcdMapService {
 
     }
 
+    //Start Sep 09, 2026 TaukirHp (ER 1020 - vn careplan icd map entity coding)
+    private Map<Long, Long> getRequstIcdMap(VnCareplanIcdMapRequest request) {
+        return request
+                .icdItemList()
+                .stream()
+                .collect(Collectors.toMap(
+                        DiagnosisIcdMapRequest::icdId,
+                        DiagnosisIcdMapRequest::seq));
+    }
+    //End Sep 09, 2026 TaukirHp (ER 1020 - vn careplan icd map entity coding)
 
 }

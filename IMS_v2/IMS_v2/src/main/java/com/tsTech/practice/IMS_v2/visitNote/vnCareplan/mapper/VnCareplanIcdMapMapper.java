@@ -23,7 +23,7 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
-
+// v1.2 || type : Change || Sep 10, 2026 || TaukirHp (ER 1021 - vn careplan icd map entity coding)
 /// //////////////////////////////////////////
 
 @Mapper(
@@ -32,12 +32,12 @@ import java.util.List;
 )
 public interface VnCareplanIcdMapMapper extends GenericMapper<VnCareplanIcdMap, VnCareplanIcdMapRequest> {
 
-    @Mapping(target = "baseRecord", source = "entity")
     @Mapping(target = "vnCareplanId", source = "entity.vnCareplan.tranId")
     @Mapping(target = "icdId", source = "entity.icd.tranId")
     VnCareplanIcdMapResponse toResponse(VnCareplanIcdMap entity);
 
     List<VnCareplanIcdMapResponse> toResponseList(List<VnCareplanIcdMap> entity);
 
-    VnCareplanIcdMapResponse fromProjectionToResponse(VnCareplanIcdMapProjection projection);
+    //Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+    List<VnCareplanIcdMapResponse> fromProjectionToResponse(List<VnCareplanIcdMapProjection> projectionList);
 }

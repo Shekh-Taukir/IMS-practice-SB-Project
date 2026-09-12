@@ -16,6 +16,7 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
+// v1.2 || type : Change || Sep 12, 2026 || TaukirHp (ER 1021 - vn careplan icd map entity coding)
 
 /// //////////////////////////////////////////
 
@@ -25,6 +26,6 @@ public record VnCareplanIcdMapResponse(
         Long seq,
         String code,
         String description,
-        @JsonUnwrapped BaseRecord baseRecord
+        Long tranId
 ) {
 }
