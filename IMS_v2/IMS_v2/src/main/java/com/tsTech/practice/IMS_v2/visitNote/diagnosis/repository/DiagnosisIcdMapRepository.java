@@ -18,6 +18,7 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : Change || Aug 21, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
+// v1.2 || type : Change || Sep 10, 2026 || TaukirHp (ER 1021 - vn careplan icd map entity coding)
 /////////////////////////////////////////////
 
 @Repository
@@ -53,11 +54,29 @@ public interface DiagnosisIcdMapRepository extends JpaRepository<DiagnosisIcdMap
                 dim.seq asc
             """;
 
+    //Start Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+    String sqlForDiagnosisIcdList = """
+            SELECT
+                dim.icd.tranId as icdId
+            FROM
+                DiagnosisIcdMap dim
+            INNER JOIN
+                Diagnosis d
+                ON d.visitNote.tranId = :pnId
+                And d.tranId = dim.diagnosis.tranId
+            """;
+    //End Sep 10, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+
     @Query(sqlCommon + sqlForSingleDiagnosis)
     List<DiagnosisIcdMapProjection> getDiagnosisIcdProjection(@Param("diagnosisId") Long diagnosisId);
 
     @Query(sqlCommon + sqlForPatientDiagnosis)
     List<DiagnosisIcdMapProjection> getDiagnosisIcdProjectionByPatientId(@Param("patientId") Long patientId);
+
+    //Start Sep 11, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
+    @Query(sqlForDiagnosisIcdList)
+    List<Long> getDiagnosisIcdListByPnId(@Param("pnId") Long pnId);
+    //End Sep 11, 2026 TaukirHp (ER 1021 - vn careplan icd map entity coding)
 
     List<DiagnosisIcdMap> findByDiagnosis_TranId(Long diagnosisId);
 

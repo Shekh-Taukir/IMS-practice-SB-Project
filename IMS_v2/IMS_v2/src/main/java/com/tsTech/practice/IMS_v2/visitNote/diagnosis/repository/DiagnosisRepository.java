@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-/////////////////////////////////////////////
+/// //////////////////////////////////////////
 //
 // Name: Diagnosis Repository
 //
@@ -24,7 +24,9 @@ import java.util.function.Function;
 // Version history:
 //
 // v1.1 || type : Change || Aug 21, 2026 || TaukirS (ER 1016 - diagnosis entity coding)
-/////////////////////////////////////////////
+// v1.2 || type : Change || Sep 12, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
+
+/// //////////////////////////////////////////
 
 @Repository
 public interface DiagnosisRepository extends JpaRepository<Diagnosis, Long> {
@@ -32,7 +34,7 @@ public interface DiagnosisRepository extends JpaRepository<Diagnosis, Long> {
     String sqlQuery = """
             SELECT
                 diag.tranId as tranId, diag.createdAt as createdAt, diag.updatedAt as updatedAt, diag.isActive as isActive,
-                vn.description as vnDescription,"""+ SqlQueryConstants.PATIENT_NAME_EXPR +"""
+                vn.description as vnDescription,""" + SqlQueryConstants.PATIENT_NAME_EXPR + """
                 , diag.visitNote.tranId as pnId, diag.patient.tranId as patientId, diag.takenAt as takenAt, diag.note as note
             FROM
                 Diagnosis diag
@@ -46,48 +48,62 @@ public interface DiagnosisRepository extends JpaRepository<Diagnosis, Long> {
 
     boolean existsByVisitNote_TranId(Long pnId);
 
-    @Query(sqlQuery+" WHERE diag.tranId = :diagnosisId")
+    @Query(sqlQuery + " WHERE diag.tranId = :diagnosisId")
     Optional<DiagnosisProjection> getDiagnosisProjectionById(@Param("diagnosisId") Long diagnosisId);
 
-    @Query(sqlQuery+" AND pat.tranId = :patientId ")
+    @Query(sqlQuery + " AND pat.tranId = :patientId ")
     List<DiagnosisProjection> getDiagnosisProjectionListByPatientId(@Param("patientId") Long patientId);
+
+    //Start Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+    Optional<Diagnosis> findByVisitNote_TranId(Long pnId);
+    //End Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
 
 
     // =========================================================================
     //  Default Methods
     // =========================================================================
 
-    default boolean checkDiagnosisExistsByPnId(Long pnId){
-        if(existsByVisitNote_TranId(pnId))
-            throw new DuplicateResourceException("DUPLICATE_DIAGNOSIS_FOR_VISIT", "Diagnosis already exists for visit ID: "+pnId);
+    default boolean checkDiagnosisExistsByPnId(Long pnId) {
+        if (existsByVisitNote_TranId(pnId))
+            throw new DuplicateResourceException("DUPLICATE_DIAGNOSIS_FOR_VISIT", "Diagnosis already exists for visit ID: " + pnId);
         return false;
     }
 
-    default DiagnosisProjection getDiagnosisProjOrThrow(Long pnId, Long diagnosisId){
+    default DiagnosisProjection getDiagnosisProjOrThrow(Long pnId, Long diagnosisId) {
         DiagnosisProjection diagnosisProjection = getDiagnosisProjectionById(diagnosisId)
-                .orElseThrow(()->new ResourceNotFoundException("Diagnosis", diagnosisId));
+                .orElseThrow(() -> new ResourceNotFoundException("Diagnosis", diagnosisId));
         checkDiagnosisExistsForVisit(diagnosisId, diagnosisProjection.getPnId(), pnId);
         return diagnosisProjection;
     }
 
     default Diagnosis getEntityById(Long pnId, Long diagnosisId) {
         Diagnosis diagnosis = findById(diagnosisId)
-                .orElseThrow(()->diagnosisNotFound(diagnosisId));
+                .orElseThrow(() -> diagnosisNotFound(diagnosisId));
         checkDiagnosisExistsForVisit(diagnosisId, diagnosis.getVisitNote().getTranId(), pnId);
         return diagnosis;
     }
+
+    //Start Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+    default Diagnosis getEntityByPnId(Long pnId) {
+        Diagnosis diagnosis = findByVisitNote_TranId(pnId)
+                .orElseThrow(() -> new ResourceNotFoundException("Diagnosis", "for pnId: " + pnId));
+
+        checkDiagnosisExistsForVisit(diagnosis.getTranId(), diagnosis.getVisitNote().getTranId(), pnId);
+        return diagnosis;
+    }
+    //End Sep 12, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
 
     // =========================================================================
     //  Internal Helper Methods
     // =========================================================================
 
-    private static ResourceNotFoundException diagnosisNotFound(Long diagnosisId){
+    private static ResourceNotFoundException diagnosisNotFound(Long diagnosisId) {
         return new ResourceNotFoundException("Diagnosis", diagnosisId);
     }
 
-    private static void checkDiagnosisExistsForVisit (Long diagnosisId, Long diagnosisPnId, Long pnId){
-        if(!(diagnosisPnId.equals(pnId)))
-            throw new BusinessValidationException("Diagnosis of id: "+diagnosisId+" is not for visit of id: "+pnId, "VISIT_DIAGNOSIS_MISMATCH");
+    private static void checkDiagnosisExistsForVisit(Long diagnosisId, Long diagnosisPnId, Long pnId) {
+        if (!(diagnosisPnId.equals(pnId)))
+            throw new BusinessValidationException("Diagnosis of id: " + diagnosisId + " is not for visit of id: " + pnId, "VISIT_DIAGNOSIS_MISMATCH");
 
     }
 }

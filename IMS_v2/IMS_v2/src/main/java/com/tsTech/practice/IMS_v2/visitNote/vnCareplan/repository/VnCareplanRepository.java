@@ -18,6 +18,7 @@ import java.util.List;
 // Version history:
 //
 // v1.1 || type : Change || Sep 04, 2026 || TaukirS (ER 1018 - visit careplan entity coding)
+// v1.2 || type : Change || Sep 08, 2026 || TaukirS (ER 1021 - vn careplan icd map entity coding)
 
 /// //////////////////////////////////////////
 
@@ -33,8 +34,8 @@ public interface VnCareplanRepository extends JpaRepository<VnCareplan, Long> {
     // =========================================================================
 
     default VnCareplan getEntityById(Long pnId, Long vnCareplanId) {
-        VnCareplan vnCareplan = findById(vnCareplanId)
-                .orElseThrow(() -> new ResourceNotFoundException("VnCareplan", vnCareplanId));
+        //Sep 08, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding) - made logic of getting vnCareplan entity code common
+        VnCareplan vnCareplan = getEntityById(vnCareplanId);
 
         if (!vnCareplan
                 .getVisitNote()
@@ -44,6 +45,13 @@ public interface VnCareplanRepository extends JpaRepository<VnCareplan, Long> {
 
         return vnCareplan;
     }
+
+    //Start Sep 08, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
+    default VnCareplan getEntityById(Long vnCareplanId) {
+        return findById(vnCareplanId)
+                .orElseThrow(() -> new ResourceNotFoundException("VnCareplan", vnCareplanId));
+    }
+    //End Sep 08, 2026 TaukirS (ER 1021 - vn careplan icd map entity coding)
 
     default boolean checkVisitAndCareplanExists(Long pnId, Long careplanId) {
         if (existsByVisitNote_TranIdAndCareplan_TranId(pnId, careplanId)) {
